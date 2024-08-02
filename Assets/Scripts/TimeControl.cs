@@ -1,62 +1,45 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TimeControl : MonoBehaviour
 {
-    // Player 이동 속도 변수
-    public float moveSpeed = 5f;
+    // slowMotionFactor: 플레이어가 멈췄을 때 시간의 흐름 속도를 설정하는 변수
+    public float slowMotionFactor = 0.1f;
+    // isPlayerMoving: 플레이어가 움직이고 있는지 여부를 저장하는 변수
+    private bool isPlayerMoving;
 
-    // 시간 스케일 변수
-    private float timeScale = 0f;
-
-    // 시간 변화 속도
-    public float smoothTime = 0.1f;
-
-    // 목표 시간 스케일
-    public float targetTimeScale = 1f;
-
-    // 최소 시간 스케일
-    public float minTimeScale = 0.1f;
-
-    // 최대 시간 스케일
-    public float maxTimeScale = 1f;
-
-    private void Update()
+    void Update()
     {
-        // 부드러운 시간 변화를 위한 SmoothDamp 사용
-        timeScale = Mathf.SmoothDamp(timeScale, targetTimeScale, ref moveSpeed, smoothTime);
-
-        // 시간 스케일 적용
-        Time.timeScale = timeScale;
+        // 매 프레임 마다 시간 제어를 처리하는 함수
+        ControlTime();
     }
 
-    // 플레이어 움직임을 체크하는 함수
+    // CheckPlayerMovement: Player 스크립트에서 호출되어 플레이어의 움직임을 감지하는 함수
     public void CheckPlayerMovement(float moveX, float moveZ)
     {
-        // 플레이어가 움직이고 있다면
-        if (moveX != 0 || moveZ != 0)
-        {
-            // 목표 시간 스케일을 최대로 설정
-            targetTimeScale = maxTimeScale;
-        }
-        else
-        {
-            // 그렇지 않다면 목표 시간 스케일을 최소로 설정
-            targetTimeScale = minTimeScale;
-        }
+        // 수평이나 수직 입력이 있는지 확인하여 Player가 움직이는지 여부를 결정
+        isPlayerMoving = moveX != 0 || moveZ != 0;
     }
 
-    // 새로 추가된 메서드: PlayerMovement.cs와의 호환성을 위해
-    public void UpdateTimeScale(bool isPlayerMoving)
+    // ControlTime: 플레이어의 움직임에 따라 시간을 제어하는 함수
+    void ControlTime()
     {
+        // 만약 플레이어가 움직일 때
         if (isPlayerMoving)
         {
-            // 플레이어가 움직이고 있다면 목표 시간 스케일을 최대로 설정
-            targetTimeScale = maxTimeScale;
+            // 시간이 정상적인 속도로 움직임
+            Time.timeScale = 1f;
+            // 물리 계산 주기도 정상 속도로 맞춤
+            Time.fixedDeltaTime = 0.02f * Time.timeScale;
         }
+        // 아니라면
         else
         {
-            // 그렇지 않다면 목표 시간 스케일을 최소로 설정
-            targetTimeScale = minTimeScale;
+            // 플레이어가 멈췄을 때 시간이 느리게 흐름
+            Time.timeScale = slowMotionFactor;
+            // 물리 계산 주기도 느린 시간 속도에 맞춤
+            Time.fixedDeltaTime = 0.02f * Time.timeScale;
         }
     }
 }
