@@ -24,4 +24,5 @@ public class EnemyAI : MonoBehaviour
             agent.SetDestination(player.position);
         }
     }
-}
+}   
+

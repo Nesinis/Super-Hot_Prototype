@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerFire : MonoBehaviour
 {
     public GameObject bulletPrefab;
-    public GameObject[] firePosition = new GameObject[3];
+    public GameObject firePosition;
 
     void Start()
     {
@@ -14,25 +14,25 @@ public class PlayerFire : MonoBehaviour
 
     void Update()
     {
-        for (int i = 0; i < firePosition.Length; i++)
+        if(Input.GetButtonDown("Fire1"))
         {
-            bool mouseInput = Input.GetButtonDown("Fire1");
-
-            if (mouseInput)
-            {
-                bulletFire(i);
-            }
+            bulletFire();
+            //print("마우스 입력");
+            //for (int i = 0; i < firePosition.Length; i++)
+            //{
+            //}
         }
     }
 
-    void bulletFire(int i)
+    void bulletFire()
     {
         Vector3 shootDirection = Camera.main.transform.forward;
-        GameObject bulletInstance = Instantiate(bulletPrefab, firePosition[i].transform.position, firePosition[i].transform.rotation);
-        BulletMove bulletMove = bulletInstance.GetComponent<BulletMove>(); //질문: BulletMove라는 자료형은 어디에서 온 거지?
+        GameObject bulletInstance = Instantiate(bulletPrefab, firePosition.transform.position, firePosition.transform.rotation);
+        BulletMove bulletMove = bulletInstance.GetComponent<BulletMove>();
         if(bulletMove != null )
         {
             bulletMove.SetDirection(shootDirection);
+            print(shootDirection.ToString());
         }
     }
 }   
