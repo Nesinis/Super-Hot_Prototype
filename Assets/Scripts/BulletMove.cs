@@ -29,7 +29,7 @@ public class BulletMove : MonoBehaviour
     {
         if (other.gameObject.name.Contains("Enemy"))   
         {
-            Destroy(other.gameObject);
+            Destroy(other.gameObject);  
         }
 
         Destroy(gameObject);
