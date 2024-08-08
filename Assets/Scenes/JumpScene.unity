@@ -274,12 +274,14 @@ MonoBehaviour:
   minAttackRange: 5
   attackRange: 10
   attackCooldown: 2
+  pistol2: {fileID: 1136688812}
   bulletPrefab: {fileID: 1292474473662677366, guid: 4d24bf712df4b4242b28777aa7a3591d, type: 3}
   firePoint: {fileID: 557366819}
   bulletSpeed: 10
+  brightRedMaterial: {fileID: 2100000, guid: 43e9d5f01f200414faaeccc21df35c27, type: 2}
+  hasGun: 0
   attackWaitTime: 1
   shootDelay: 0.1
-  brightRedMaterial: {fileID: 2100000, guid: 43e9d5f01f200414faaeccc21df35c27, type: 2}
 --- !u!54 &46091180
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -378,12 +380,14 @@ MonoBehaviour:
   minAttackRange: 5
   attackRange: 10
   attackCooldown: 2
+  pistol2: {fileID: 823752139}
   bulletPrefab: {fileID: 1292474473662677366, guid: 4d24bf712df4b4242b28777aa7a3591d, type: 3}
   firePoint: {fileID: 1047848392}
   bulletSpeed: 10
+  brightRedMaterial: {fileID: 2100000, guid: 43e9d5f01f200414faaeccc21df35c27, type: 2}
+  hasGun: 0
   attackWaitTime: 1
   shootDelay: 0.1
-  brightRedMaterial: {fileID: 2100000, guid: 43e9d5f01f200414faaeccc21df35c27, type: 2}
 --- !u!54 &69156634
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2063,12 +2067,14 @@ MonoBehaviour:
   minAttackRange: 5
   attackRange: 10
   attackCooldown: 2
+  pistol2: {fileID: 1805520417}
   bulletPrefab: {fileID: 1292474473662677366, guid: 4d24bf712df4b4242b28777aa7a3591d, type: 3}
   firePoint: {fileID: 1914495562}
   bulletSpeed: 10
+  brightRedMaterial: {fileID: 2100000, guid: 43e9d5f01f200414faaeccc21df35c27, type: 2}
+  hasGun: 0
   attackWaitTime: 1
   shootDelay: 0.1
-  brightRedMaterial: {fileID: 2100000, guid: 43e9d5f01f200414faaeccc21df35c27, type: 2}
 --- !u!54 &653305886
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2443,6 +2449,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1726516703}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+--- !u!1 &823752139 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3763604498974455608, guid: 24293e33d3322f84bb98b6c032ce2dc9, type: 3}
+  m_PrefabInstance: {fileID: 1047427933}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &829612628
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2593,12 +2604,14 @@ MonoBehaviour:
   minAttackRange: 5
   attackRange: 10
   attackCooldown: 2
+  pistol2: {fileID: 1330981130}
   bulletPrefab: {fileID: 1292474473662677366, guid: 4d24bf712df4b4242b28777aa7a3591d, type: 3}
   firePoint: {fileID: 838534647}
   bulletSpeed: 10
+  brightRedMaterial: {fileID: 2100000, guid: 43e9d5f01f200414faaeccc21df35c27, type: 2}
+  hasGun: 0
   attackWaitTime: 1
   shootDelay: 0.1
-  brightRedMaterial: {fileID: 2100000, guid: 43e9d5f01f200414faaeccc21df35c27, type: 2}
 --- !u!136 &829612637
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2883,12 +2896,14 @@ MonoBehaviour:
   minAttackRange: 5
   attackRange: 10
   attackCooldown: 2
+  pistol2: {fileID: 1430083308}
   bulletPrefab: {fileID: 1292474473662677366, guid: 4d24bf712df4b4242b28777aa7a3591d, type: 3}
   firePoint: {fileID: 11998163}
   bulletSpeed: 10
+  brightRedMaterial: {fileID: 2100000, guid: 43e9d5f01f200414faaeccc21df35c27, type: 2}
+  hasGun: 0
   attackWaitTime: 1
   shootDelay: 0.1
-  brightRedMaterial: {fileID: 2100000, guid: 43e9d5f01f200414faaeccc21df35c27, type: 2}
 --- !u!54 &959544617
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3194,12 +3209,14 @@ MonoBehaviour:
   minAttackRange: 5
   attackRange: 10
   attackCooldown: 2
+  pistol2: {fileID: 1203147118}
   bulletPrefab: {fileID: 1292474473662677366, guid: 4d24bf712df4b4242b28777aa7a3591d, type: 3}
   firePoint: {fileID: 814985496}
   bulletSpeed: 10
+  brightRedMaterial: {fileID: 2100000, guid: 43e9d5f01f200414faaeccc21df35c27, type: 2}
+  hasGun: 0
   attackWaitTime: 1
   shootDelay: 0.1
-  brightRedMaterial: {fileID: 2100000, guid: 43e9d5f01f200414faaeccc21df35c27, type: 2}
 --- !u!54 &1071020738
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3473,15 +3490,15 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 80ec9d4b1fe521f4d92830bd743a27d5, type: 3}
   m_PrefabInstance: {fileID: 1491799085}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1136688812 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3763604498974455608, guid: 24293e33d3322f84bb98b6c032ce2dc9, type: 3}
+  m_PrefabInstance: {fileID: 1631643764}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1159126390 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2189845786099749597, guid: 9ea69b4e70540424ea90c3b7f8f388e8, type: 3}
   m_PrefabInstance: {fileID: 143878602}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &1162729069 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1786759125029253417, guid: 24293e33d3322f84bb98b6c032ce2dc9, type: 3}
-  m_PrefabInstance: {fileID: 2135502941}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1171770913
 GameObject:
@@ -3512,7 +3529,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1162729069}
+  m_Father: {fileID: 1786759126022832500}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1001 &1199679214
 PrefabInstance:
@@ -3591,6 +3608,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 788f99c0acce4384a91a6c213fb34068, type: 3}
+--- !u!1 &1203147118 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3763604498974455608, guid: 24293e33d3322f84bb98b6c032ce2dc9, type: 3}
+  m_PrefabInstance: {fileID: 387538328}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1236176076 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 9ea69b4e70540424ea90c3b7f8f388e8, type: 3}
@@ -3635,12 +3657,14 @@ MonoBehaviour:
   minAttackRange: 5
   attackRange: 10
   attackCooldown: 2
+  pistol2: {fileID: 3763604497208051557}
   bulletPrefab: {fileID: 1292474473662677366, guid: 4d24bf712df4b4242b28777aa7a3591d, type: 3}
   firePoint: {fileID: 1171770914}
   bulletSpeed: 10
+  brightRedMaterial: {fileID: 2100000, guid: 43e9d5f01f200414faaeccc21df35c27, type: 2}
+  hasGun: 0
   attackWaitTime: 1
   shootDelay: 0.1
-  brightRedMaterial: {fileID: 2100000, guid: 43e9d5f01f200414faaeccc21df35c27, type: 2}
 --- !u!54 &1236176079
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3876,6 +3900,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1288817551}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1330981130 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3763604498974455608, guid: 24293e33d3322f84bb98b6c032ce2dc9, type: 3}
+  m_PrefabInstance: {fileID: 2059159241}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1369504910
 GameObject:
   m_ObjectHideFlags: 0
@@ -4019,6 +4048,11 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 2189845786099749597, guid: 9ea69b4e70540424ea90c3b7f8f388e8, type: 3}
   m_PrefabInstance: {fileID: 1394335258}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1430083308 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3763604498974455608, guid: 24293e33d3322f84bb98b6c032ce2dc9, type: 3}
+  m_PrefabInstance: {fileID: 1238008623}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1460339136
 GameObject:
@@ -5366,6 +5400,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4761261427112774961, guid: 788f99c0acce4384a91a6c213fb34068, type: 3}
   m_PrefabInstance: {fileID: 556780932}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1805520417 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3763604498974455608, guid: 24293e33d3322f84bb98b6c032ce2dc9, type: 3}
+  m_PrefabInstance: {fileID: 788929137}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1848579837
 GameObject:
   m_ObjectHideFlags: 0
@@ -5499,7 +5538,7 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 2189845786099749597, guid: 9ea69b4e70540424ea90c3b7f8f388e8, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1162729069}
+      addedObject: {fileID: 1786759126022832500}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9ea69b4e70540424ea90c3b7f8f388e8, type: 3}
       insertIndex: -1
@@ -6021,6 +6060,16 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 4761261427112774961, guid: 788f99c0acce4384a91a6c213fb34068, type: 3}
   m_PrefabInstance: {fileID: 16796276}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1786759126022832500 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1786759125029253417, guid: 24293e33d3322f84bb98b6c032ce2dc9, type: 3}
+  m_PrefabInstance: {fileID: 2135502941}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3763604497208051557 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3763604498974455608, guid: 24293e33d3322f84bb98b6c032ce2dc9, type: 3}
+  m_PrefabInstance: {fileID: 2135502941}
   m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

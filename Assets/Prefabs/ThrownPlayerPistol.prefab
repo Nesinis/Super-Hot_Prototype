@@ -761,7 +761,7 @@ GameObject:
   - component: {fileID: -393219977504140527}
   - component: {fileID: -936078184739816209}
   m_Layer: 0
-  m_Name: Pistol
+  m_Name: ThrownPlayerPistol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
