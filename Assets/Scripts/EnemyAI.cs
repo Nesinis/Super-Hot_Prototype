@@ -26,6 +26,12 @@ public class EnemyAI : MonoBehaviour
     public float attackWaitTime = 1.0f; // 공격 후 추가 대기 시간
     public float shootDelay = 0.1f; // 총알 발사 딜레이 (애니메이션이 시작된 후)
 
+    //public GameObject enemyPistolPrefab;
+    public GameObject thrownEnemyPistol;
+    public GameObject throwRotaion;
+    public float throwPower = 20f;
+
+
     void Start()
     {
         // NavMeshAgent 컴포넌트를 가져옵니다.
@@ -227,5 +233,35 @@ public class EnemyAI : MonoBehaviour
         direction.y = 0; // 수평 회전만 고려하고, 적의 머리가 플레이어를 직접 쳐다보지 않도록 Y 축은 0으로 설정합니다.
         Quaternion lookRotation = Quaternion.LookRotation(direction);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10.0f); // 부드러운 회전을 위해 Slerp를 사용합니다.
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.name.Contains("ThrownPlayerPistol"))
+        {
+            throwEnemyPistol();
+        }
+
+        //if (other.gameObject.name.Contains("Player"))
+        //{
+        //    Destroy(other.gameObject);
+        //}
+    }
+    void throwEnemyPistol()
+    {
+        if (pistol2 != null)
+        {
+            Destroy(pistol2);
+            GameObject goThrownEnemyPistol = Instantiate(thrownEnemyPistol, throwRotaion.transform.position, throwRotaion.transform.rotation);
+            print("pistol generated");
+            Rigidbody rb = goThrownEnemyPistol.GetComponent<Rigidbody>();
+
+            if (rb != null)
+            {
+                print("rb != null");
+                Vector3 throwDir = (throwRotaion.transform.forward + throwRotaion.transform.up * 0.3f).normalized;
+                rb.AddForce(throwDir * throwPower, ForceMode.Impulse);
+            }
+        }
+
     }
 }

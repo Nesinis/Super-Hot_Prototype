@@ -44,9 +44,9 @@ public class PlayerFire : MonoBehaviour
             if (PlayerPistol != null)
             {
                 Destroy(PlayerPistol);
-                GameObject throwedPistol = Instantiate(pistolPrefab, firePosition.transform.position, firePosition.transform.rotation);
+                GameObject thrownPistol = Instantiate(pistolPrefab, firePosition.transform.position, firePosition.transform.rotation);
                 print("pistol generated");
-                Rigidbody rb = throwedPistol.GetComponent<Rigidbody>();
+                Rigidbody rb = thrownPistol.GetComponent<Rigidbody>();
 
                 if(rb != null)
                 {
