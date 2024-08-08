@@ -51,14 +51,14 @@ public class EnemyAI : MonoBehaviour
         // 플레이어의 위치로 NavMeshAgent의 목적지를 설정합니다.
         if (player != null)
         {
-            agent.SetDestination(player.position);
+            //agent.SetDestination(player.position);
 
             // 애니메이션 업데이트
             float speed = agent.velocity.magnitude;
             animator.SetFloat("Speed", speed); // 지속적으로 Speed 값을 업데이트
 
-            Debug.Log("Current speed: " + speed);
-            Debug.Log("Is Walking State: " + animator.GetCurrentAnimatorStateInfo(0).IsName("Walk"));
+            //Debug.Log("Current speed: " + speed);
+            //Debug.Log("Is Walking State: " + animator.GetCurrentAnimatorStateInfo(0).IsName("Walk"));
 
             // 플레이어와의 거리를 계산합니다.
             float distanceToPlayer = Vector3.Distance(transform.position, player.position);
@@ -119,12 +119,12 @@ public class EnemyAI : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("Bullet 프리팹에 Rigidbody 컴포넌트가 없습니다.");
+                //Debug.LogWarning("Bullet 프리팹에 Rigidbody 컴포넌트가 없습니다.");
             }
         }
         else
         {
-            Debug.LogWarning("BulletPrefab, FirePoint 또는 Player가 할당되지 않았습니다.");
+            //Debug.LogWarning("BulletPrefab, FirePoint 또는 Player가 할당되지 않았습니다.");
         }
     }
 
@@ -178,5 +178,17 @@ public class EnemyAI : MonoBehaviour
         playerIsDead = true;
         agent.isStopped = true; // 적의 움직임을 멈춥니다.
         animator.SetFloat("Speed", 0); // 이동 애니메이션을 멈춥니다.
+    }
+    void OnTriggerEnter(Collider other)
+    {
+        // 충돌한 오브젝트가 총알인지 확인합니다.
+        if (other.gameObject.CompareTag("Bullet"))
+        {
+            // 총알과 충돌했으므로 적을 제거합니다.
+            Destroy(gameObject);
+
+            // 총알도 제거합니다.
+            Destroy(other.gameObject);
+        }
     }
 }

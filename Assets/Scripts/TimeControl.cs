@@ -29,23 +29,8 @@ public class TimeControl : MonoBehaviour
         Time.timeScale = timeScale;
     }
 
-    // 플레이어 움직임을 체크하는 함수
-    public void CheckPlayerMovement(float moveX, float moveZ)
-    {
-        // 플레이어가 움직이고 있다면
-        if (moveX != 0 || moveZ != 0)
-        {
-            // 목표 시간 스케일을 최대로 설정
-            targetTimeScale = maxTimeScale;
-        }
-        else
-        {
-            // 그렇지 않다면 목표 시간 스케일을 최소로 설정
-            targetTimeScale = minTimeScale;
-        }
-    }
+  
 
-    // 새로 추가된 메서드: PlayerMovement.cs와의 호환성을 위해
     public void UpdateTimeScale(bool isPlayerMoving)
     {
         if (isPlayerMoving)
