@@ -98,7 +98,7 @@ public class PlayerMovement : MonoBehaviour
 
         // 수직 이동 확인
         float currentYPosition = transform.position.y;
-        if (Mathf.Abs(currentYPosition - lastYPosition) > 0.000001f)
+        if (Mathf.Abs(currentYPosition - lastYPosition) > 1f)
         {
             isMoving = true;
         }
@@ -113,4 +113,5 @@ public class PlayerMovement : MonoBehaviour
             timeControl.UpdateTimeScale(isMoving);
         }
     }
+   
 }

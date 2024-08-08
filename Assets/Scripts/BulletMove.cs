@@ -32,6 +32,12 @@ public class BulletMove : MonoBehaviour
             Destroy(other.gameObject);  
         }
 
+        //if (other.gameObject.name.Contains("Player"))
+        //{
+        //    Destroy(other.gameObject);
+        //}
+
         Destroy(gameObject);
     }
 }
+
