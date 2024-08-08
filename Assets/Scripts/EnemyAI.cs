@@ -29,7 +29,7 @@ public class EnemyAI : MonoBehaviour
     //public GameObject enemyPistolPrefab;
     public GameObject thrownEnemyPistol;
     public GameObject throwRotaion;
-    public float throwPower = 20f;
+    public float throwPower = 5f;
 
 
     void Start()
