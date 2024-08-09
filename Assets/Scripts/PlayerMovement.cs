@@ -27,6 +27,12 @@ public class PlayerMovement : MonoBehaviour
     // 플레이어의 이동 상태를 저장하는 변수
     private bool isMoving = false;
 
+
+    public GameObject PlayerPistol; // 플레이어가 들고 있는 총
+    private GameObject ThrownEnemyPistol;
+    public float pickupRange = 2.0f; // 총을 집을 수 있는 범위
+
+
     void Start()
     {
         // CharacterController 컴포넌트를 가져온다
@@ -51,6 +57,8 @@ public class PlayerMovement : MonoBehaviour
 
         // 시간 조절 업데이트
         UpdateTimeControl();
+
+        getPistol(); // 플레이어가 총을 잡는다.
     }
 
     void HandleRotation()
@@ -113,5 +121,32 @@ public class PlayerMovement : MonoBehaviour
             timeControl.UpdateTimeScale(isMoving);
         }
     }
-   
+    void getPistol()
+    {
+        if (ThrownEnemyPistol != null && PlayerPistol != null)
+        {
+            // 1. 바닥에 있는 ThrownEnemyPistol이 일정 거리 내에 있는지 확인
+            float distanceToPistol = Vector3.Distance(transform.position, ThrownEnemyPistol.transform.position);
+
+            if (distanceToPistol <= pickupRange)
+            {
+                // 2. PlayerPistol이 비활성화되어 있는 상태인지 확인
+                if (!PlayerPistol.activeInHierarchy)
+                {
+                    // 3. 마우스 좌클릭을 했는지 확인
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        // ThrownEnemyPistol을 비활성화하고, PlayerPistol을 활성화
+                        ThrownEnemyPistol.SetActive(false);
+                        PlayerPistol.SetActive(true);
+                        print("Pistol picked up and activated");
+                    }
+                }
+            }
+        }
+    }
+    public void UpdateThrownEnemyPistol(GameObject thrownPistol)
+    {
+        ThrownEnemyPistol = thrownPistol;
+    }
 }

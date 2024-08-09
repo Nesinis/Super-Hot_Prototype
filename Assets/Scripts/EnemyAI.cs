@@ -29,7 +29,7 @@ public class EnemyAI : MonoBehaviour
     //public GameObject enemyPistolPrefab;
     public GameObject thrownEnemyPistol;
     public GameObject throwRotaion;
-    public float throwPower = 5f;
+    public float throwPower = 3f;
 
 
     void Start()
@@ -40,7 +40,7 @@ public class EnemyAI : MonoBehaviour
         animator = GetComponent<Animator>();
         lastAttackTime = -attackCooldown; // 시작 시 바로 공격할 수 있도록 설정
 
-        CheckGunPresence();
+        //CheckGunPresence();
 
         // 플레이어 사망 이벤트 구독
         if (player != null)
@@ -64,7 +64,7 @@ public class EnemyAI : MonoBehaviour
         // 적이 플레이어를 계속 바라보게 합니다.
         LookAtPlayer();
 
-        CheckGunPresence();
+        //CheckGunPresence();
         if (player != null)
         {
             // 플레이어의 위치로 NavMeshAgent의 목적지를 설정합니다.
@@ -93,10 +93,10 @@ public class EnemyAI : MonoBehaviour
             }
             if (speed > 0.1f)
             {
-                Debug.Log("Transition to Unarmed_Walk should occur.");
+                //Debug.Log("Transition to Unarmed_Walk should occur.");
             }
         }
-        Debug.Log("HasGun: " + hasGun);
+        //Debug.Log("HasGun: " + hasGun);
     }
 
     void AttackWithMelee()
@@ -224,7 +224,7 @@ public class EnemyAI : MonoBehaviour
     {
         hasGun = pistol2.activeInHierarchy; // 총의 존재 여부를 확인
         animator.SetBool("HasGun", hasGun); // 애니메이터 상태 업데이트
-        Debug.Log("HasGun 상태: " + hasGun);
+        //Debug.Log("HasGun 상태: " + hasGun);
     }
 
     void LookAtPlayer()
@@ -252,14 +252,19 @@ public class EnemyAI : MonoBehaviour
         {
             Destroy(pistol2);
             GameObject goThrownEnemyPistol = Instantiate(thrownEnemyPistol, throwRotaion.transform.position, throwRotaion.transform.rotation);
-            print("pistol generated");
             Rigidbody rb = goThrownEnemyPistol.GetComponent<Rigidbody>();
 
             if (rb != null)
             {
-                print("rb != null");
                 Vector3 throwDir = (throwRotaion.transform.forward + throwRotaion.transform.up * 0.3f).normalized;
                 rb.AddForce(throwDir * throwPower, ForceMode.Impulse);
+            }
+
+            // PlayerMovement에 있는 ThrownEnemyPistol 변수를 업데이트합니다.
+            PlayerMovement playerMovement = FindObjectOfType<PlayerMovement>();
+            if (playerMovement != null)
+            {
+                playerMovement.UpdateThrownEnemyPistol(goThrownEnemyPistol);
             }
         }
 

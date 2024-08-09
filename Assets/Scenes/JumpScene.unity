@@ -1766,7 +1766,7 @@ MonoBehaviour:
   shootDelay: 0.1
   thrownEnemyPistol: {fileID: 3763604498974455608, guid: 68c9f3a7fb43c994594484cc65bf4ad4, type: 3}
   throwRotaion: {fileID: 510942203}
-  throwPower: 20
+  throwPower: 3
 --- !u!136 &829612637
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -3242,6 +3242,14 @@ PrefabInstance:
       propertyPath: jumpForce
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 6336684166728618931, guid: 6943fbcfa6ca8fc4898224d6302b5577, type: 3}
+      propertyPath: PlayerPistol
+      value: 
+      objectReference: {fileID: 1743219848}
+    - target: {fileID: 6336684166728618931, guid: 6943fbcfa6ca8fc4898224d6302b5577, type: 3}
+      propertyPath: ThrownEnemyPistol
+      value: 
+      objectReference: {fileID: 3763604498974455608, guid: 68c9f3a7fb43c994594484cc65bf4ad4, type: 3}
     - target: {fileID: 7122330076534708778, guid: 6943fbcfa6ca8fc4898224d6302b5577, type: 3}
       propertyPath: m_CastShadows
       value: 0

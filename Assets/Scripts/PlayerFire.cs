@@ -33,7 +33,7 @@ public class PlayerFire : MonoBehaviour
             if(bulletMove != null )
             {
                 bulletMove.SetDirection(shootDirection);
-                print(shootDirection.ToString());
+                //print(shootDirection.ToString());
             }
         }
     }
@@ -43,15 +43,14 @@ public class PlayerFire : MonoBehaviour
         {
             if (PlayerPistol != null)
             {
-                Destroy(PlayerPistol);
+                PlayerPistol.SetActive(false); // PlayerPistol을 비활성화합니다.
                 GameObject thrownPistol = Instantiate(pistolPrefab, firePosition.transform.position, firePosition.transform.rotation);
-                print("pistol generated");
+                
                 Rigidbody rb = thrownPistol.GetComponent<Rigidbody>();
 
                 if(rb != null)
                 {
-                    print("rb != null");
-                    Vector3 throwDir = (firePosition.transform.forward + firePosition.transform.up * 0.3f).normalized;
+                    Vector3 throwDir = (firePosition.transform.forward + firePosition.transform.up * 0.2f).normalized;
                     rb.AddForce(throwDir * throwPower, ForceMode.Impulse);
                 }
             }
