@@ -80,6 +80,7 @@ public class PlayerFire : MonoBehaviour
             {
                 // 총알에 발사 방향 설정
                 bulletMove.SetDirection(shootDirection);
+                //print(shootDirection.ToString());
             }
         }
     }
@@ -87,21 +88,22 @@ public class PlayerFire : MonoBehaviour
     // 피스톨을 던지는 메소드
     void throwPistol()
     {
-        if (PlayerPistol != null)
+        if(Input.GetMouseButtonDown(1))
         {
-            // 플레이어 피스톨을 파괴하고 참조를 초기화
-            Destroy(PlayerPistol);
-            PlayerPistol = null; // 참조 초기화
-
-            // 피스톨을 던질 위치에서 인스턴스를 생성
-            GameObject thrownPistol = Instantiate(pistolPrefab, firePosition.transform.position, Quaternion.identity);
-            Rigidbody rb = thrownPistol.GetComponent<Rigidbody>();
-            if (rb != null)
+            if (PlayerPistol != null)
             {
-                // 던질 방향을 설정하고 힘을 가하여 피스톨을 던짐
-                Vector3 throwDir = (firePosition.transform.forward + firePosition.transform.up * 0.3f).normalized;
-                rb.AddForce(throwDir * throwPower, ForceMode.Impulse);
+                PlayerPistol.SetActive(false); // PlayerPistol을 비활성화합니다.
+                GameObject thrownPistol = Instantiate(pistolPrefab, firePosition.transform.position, firePosition.transform.rotation);
+                
+                Rigidbody rb = thrownPistol.GetComponent<Rigidbody>();
+
+                if(rb != null)
+                {
+                    Vector3 throwDir = (firePosition.transform.forward + firePosition.transform.up * 0.2f).normalized;
+                    rb.AddForce(throwDir * throwPower, ForceMode.Impulse);
+                }
             }
+
         }
     }
 }

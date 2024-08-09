@@ -29,7 +29,7 @@ public class EnemyAI : MonoBehaviour
 
     public GameObject thrownEnemyPistol;
     public GameObject throwRotaion;
-    public float throwPower = 5f;
+    public float throwPower = 3f;
 
     void Start()
     {
@@ -37,7 +37,7 @@ public class EnemyAI : MonoBehaviour
         animator = GetComponent<Animator>();
         lastAttackTime = -attackCooldown; // 시작 시 바로 공격할 수 있도록 설정
 
-        CheckGunPresence();
+        //CheckGunPresence();
 
         if (player != null)
         {
@@ -59,7 +59,7 @@ public class EnemyAI : MonoBehaviour
 
         LookAtPlayer();
 
-        CheckGunPresence();
+        //CheckGunPresence();
         if (player != null)
         {
             agent.SetDestination(player.position);
@@ -83,10 +83,10 @@ public class EnemyAI : MonoBehaviour
             }
             if (speed > 0.1f)
             {
-                Debug.Log("Transition to Unarmed_Walk should occur.");
+                //Debug.Log("Transition to Unarmed_Walk should occur.");
             }
         }
-        Debug.Log("HasGun: " + hasGun);
+        //Debug.Log("HasGun: " + hasGun);
     }
 
     void AttackWithMelee()
@@ -236,6 +236,13 @@ public class EnemyAI : MonoBehaviour
             {
                 Vector3 throwDir = (throwRotaion.transform.forward + throwRotaion.transform.up * 0.3f).normalized;
                 rb.AddForce(throwDir * throwPower, ForceMode.Impulse);
+            }
+
+            // PlayerMovement에 있는 ThrownEnemyPistol 변수를 업데이트합니다.
+            PlayerMovement playerMovement = FindObjectOfType<PlayerMovement>();
+            if (playerMovement != null)
+            {
+                playerMovement.UpdateThrownEnemyPistol(goThrownEnemyPistol);
             }
         }
     }
