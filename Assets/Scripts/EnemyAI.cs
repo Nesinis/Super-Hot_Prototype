@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
 
 public class EnemyAI : MonoBehaviour
 {
@@ -26,23 +27,18 @@ public class EnemyAI : MonoBehaviour
     public float attackWaitTime = 1.0f; // 공격 후 추가 대기 시간
     public float shootDelay = 0.1f; // 총알 발사 딜레이 (애니메이션이 시작된 후)
 
-    //public GameObject enemyPistolPrefab;
     public GameObject thrownEnemyPistol;
     public GameObject throwRotaion;
     public float throwPower = 5f;
 
-
     void Start()
     {
-        // NavMeshAgent 컴포넌트를 가져옵니다.
         agent = GetComponent<NavMeshAgent>();
-        // Animator 컴포넌트를 가져옵니다.
         animator = GetComponent<Animator>();
         lastAttackTime = -attackCooldown; // 시작 시 바로 공격할 수 있도록 설정
 
         CheckGunPresence();
 
-        // 플레이어 사망 이벤트 구독
         if (player != null)
         {
             PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
@@ -61,33 +57,27 @@ public class EnemyAI : MonoBehaviour
         if (isAttacking)
             return; // 공격 중이면 이동을 멈춥니다.
 
-        // 적이 플레이어를 계속 바라보게 합니다.
         LookAtPlayer();
 
         CheckGunPresence();
         if (player != null)
         {
-            // 플레이어의 위치로 NavMeshAgent의 목적지를 설정합니다.
             agent.SetDestination(player.position);
 
             // 애니메이션 업데이트
             float speed = agent.velocity.magnitude;
             animator.SetFloat("Speed", speed); // 지속적으로 Speed 값을 업데이트
 
-            // 플레이어와의 거리를 계산합니다.
             float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-            // 공격 범위 내에 플레이어가 있는지 확인합니다.
             if (Time.time >= lastAttackTime + attackCooldown)
             {
                 if (hasGun && distanceToPlayer <= attackRange)
                 {
-                    // 총을 들고 있고 범위 내에 있으면 총으로 공격
                     AttackWithGun();
                 }
                 else if (!hasGun && distanceToPlayer <= minAttackRange)
                 {
-                    // 총이 없고 근접 범위 내에 있으면 주먹으로 공격
                     AttackWithMelee();
                 }
             }
@@ -101,36 +91,23 @@ public class EnemyAI : MonoBehaviour
 
     void AttackWithMelee()
     {
-        // 주먹 공격 중 상태로 전환합니다.
         isAttacking = true;
         agent.isStopped = true; // 이동을 멈춥니다.
 
-        // 주먹 공격 애니메이션을 재생합니다.
-        animator.SetTrigger("Punch");
-
-        // 공격 애니메이션이 끝난 후 이동을 재개합니다.
         StartCoroutine(ResumeMovementAfterAttack());
     }
 
     void AttackWithGun()
     {
-        // 총 공격 중 상태로 전환합니다.
         isAttacking = true;
         agent.isStopped = true; // 이동을 멈춥니다.
 
-        // 총 공격 애니메이션을 재생합니다.
-        animator.SetTrigger("Shoot");
-
-        // 총알을 발사하는 코루틴을 시작합니다.
         StartCoroutine(ShootAfterDelay());
-
-        // 공격 애니메이션이 끝난 후 이동을 재개합니다.
         StartCoroutine(ResumeMovementAfterAttack());
     }
 
     public void Shoot()
     {
-        // 총알을 생성하고 발사합니다.
         if (bulletPrefab != null && firePoint != null && player != null)
         {
             Vector3 targetPosition = player.position; // 플레이어의 중심을 목표로 설정
@@ -144,7 +121,6 @@ public class EnemyAI : MonoBehaviour
                 rb.useGravity = false; // 중력 사용 비활성화
                 rb.velocity = direction * bulletSpeed; // 총알의 초기 속도를 설정
 
-                // 이미 있는 Trail Renderer 설정
                 TrailRenderer trail = bullet.GetComponent<TrailRenderer>();
                 if (trail != null)
                 {
@@ -171,29 +147,21 @@ public class EnemyAI : MonoBehaviour
 
     System.Collections.IEnumerator ShootAfterDelay()
     {
-        // 공격 애니메이션이 시작된 후 잠시 대기합니다.
         yield return new WaitForSeconds(shootDelay);
 
-        // 플레이어를 조준합니다.
         if (player != null)
         {
-            // 적이 플레이어를 향하도록 회전시킵니다.
             transform.LookAt(new Vector3(player.position.x, transform.position.y, player.position.z));
         }
 
-        // 총알을 발사합니다.
         Shoot();
     }
 
     System.Collections.IEnumerator ResumeMovementAfterAttack()
     {
-        // 공격 애니메이션이 끝날 때까지 대기합니다.
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
-
-        // 추가 대기 시간을 기다립니다.
         yield return new WaitForSeconds(attackWaitTime);
 
-        // 공격이 끝나면 이동을 재개합니다.
         isAttacking = false;
         agent.isStopped = false;
     }
@@ -202,6 +170,7 @@ public class EnemyAI : MonoBehaviour
     {
         if (!isDead)
         {
+            StartCoroutine(Stun());
             Die();
         }
     }
@@ -222,46 +191,61 @@ public class EnemyAI : MonoBehaviour
 
     void CheckGunPresence()
     {
-        hasGun = pistol2.activeInHierarchy; // 총의 존재 여부를 확인
-        animator.SetBool("HasGun", hasGun); // 애니메이터 상태 업데이트
-        Debug.Log("HasGun 상태: " + hasGun);
+        if (pistol2 != null)
+        {
+            hasGun = pistol2.activeInHierarchy; // 총의 존재 여부를 확인
+            animator.SetBool("HasGun", hasGun); // 애니메이터 상태 업데이트
+            Debug.Log("HasGun 상태: " + hasGun);
+        }
+        else
+        {
+            hasGun = false; // pistol2가 null이면 총이 없는 상태로 설정
+            animator.SetBool("HasGun", hasGun); // 애니메이터 상태 업데이트
+        }
     }
 
     void LookAtPlayer()
     {
-        Vector3 direction = player.position - transform.position;
-        direction.y = 0; // 수평 회전만 고려하고, 적의 머리가 플레이어를 직접 쳐다보지 않도록 Y 축은 0으로 설정합니다.
-        Quaternion lookRotation = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10.0f); // 부드러운 회전을 위해 Slerp를 사용합니다.
+        if (player != null)
+        {
+            Vector3 direction = player.position - transform.position;
+            direction.y = 0;
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10.0f);
+        }
     }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.name.Contains("ThrownPlayerPistol"))
         {
             throwEnemyPistol();
         }
-
-        //if (other.gameObject.name.Contains("Player"))
-        //{
-        //    Destroy(other.gameObject);
-        //}
     }
-    void throwEnemyPistol()
+
+    public void throwEnemyPistol()
     {
         if (pistol2 != null)
         {
             Destroy(pistol2);
+            pistol2 = null; // 참조 초기화
             GameObject goThrownEnemyPistol = Instantiate(thrownEnemyPistol, throwRotaion.transform.position, throwRotaion.transform.rotation);
-            print("pistol generated");
             Rigidbody rb = goThrownEnemyPistol.GetComponent<Rigidbody>();
 
             if (rb != null)
             {
-                print("rb != null");
                 Vector3 throwDir = (throwRotaion.transform.forward + throwRotaion.transform.up * 0.3f).normalized;
                 rb.AddForce(throwDir * throwPower, ForceMode.Impulse);
             }
         }
+    }
 
+    public IEnumerator Stun()
+    {
+        Debug.Log(gameObject.name + " is now stunned.");  // 스턴 시작 디버그 메시지
+        agent.isStopped = true;  // NavMeshAgent 이동 중지
+        yield return new WaitForSeconds(1.0f);  // 1초간 대기
+        agent.isStopped = false;  // 이동 재개
+        Debug.Log(gameObject.name + " has recovered from stun.");  // 스턴 해제 디버그 메시지
     }
 }
