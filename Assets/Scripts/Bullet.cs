@@ -36,7 +36,8 @@ public class Bullet : MonoBehaviour
             EnemyAI enemyAI = other.GetComponent<EnemyAI>();
             if (enemyAI != null)
             {
-                enemyAI.TakeDamage(); // 적에게 피해를 입힙니다.
+                Debug.Log("Bullet hit the enemy."); // 디버그 메시지 추가
+                enemyAI.Die(); // 적을 즉시 사망 처리
             }
             Destroy(gameObject); // 총알을 파괴합니다.
         }

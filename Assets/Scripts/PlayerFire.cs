@@ -68,13 +68,13 @@ public class PlayerFire : MonoBehaviour
     // 총을 발사하는 메소드
     void bulletFire1()
     {
-        // Fire1 버튼이 눌렸을 때
-        if (Input.GetButtonDown("Fire1"))
+        // 피스톨이 존재하는지 확인
+        if (PlayerPistol != null)
         {
             // 메인 카메라의 정면 방향으로 총알을 발사
             Vector3 shootDirection = Camera.main.transform.forward;
             // 총알 인스턴스를 생성하고 위치와 회전을 설정
-            GameObject bulletInstance = Instantiate(bulletPrefab, firePosition.transform.position, Quaternion.identity);
+            GameObject bulletInstance = Instantiate(bulletPrefab, firePosition.transform.position, firePosition.transform.rotation);
             BulletMove bulletMove = bulletInstance.GetComponent<BulletMove>();
             if (bulletMove != null)
             {
@@ -88,22 +88,18 @@ public class PlayerFire : MonoBehaviour
     // 피스톨을 던지는 메소드
     void throwPistol()
     {
-        if(Input.GetMouseButtonDown(1))
+        if (PlayerPistol != null)
         {
-            if (PlayerPistol != null)
+            PlayerPistol.SetActive(false); // PlayerPistol을 비활성화합니다.
+            GameObject thrownPistol = Instantiate(pistolPrefab, firePosition.transform.position, firePosition.transform.rotation);
+
+            Rigidbody rb = thrownPistol.GetComponent<Rigidbody>();
+
+            if (rb != null)
             {
-                PlayerPistol.SetActive(false); // PlayerPistol을 비활성화합니다.
-                GameObject thrownPistol = Instantiate(pistolPrefab, firePosition.transform.position, firePosition.transform.rotation);
-                
-                Rigidbody rb = thrownPistol.GetComponent<Rigidbody>();
-
-                if(rb != null)
-                {
-                    Vector3 throwDir = (firePosition.transform.forward + firePosition.transform.up * 0.2f).normalized;
-                    rb.AddForce(throwDir * throwPower, ForceMode.Impulse);
-                }
+                Vector3 throwDir = (firePosition.transform.forward + firePosition.transform.up * 0.2f).normalized;
+                rb.AddForce(throwDir * throwPower, ForceMode.Impulse);
             }
-
         }
     }
 }

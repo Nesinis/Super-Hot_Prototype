@@ -31,13 +31,15 @@ public class EnemyAI : MonoBehaviour
     public GameObject throwRotaion;
     public float throwPower = 3f;
 
+    public GameObject explosionParticlePrefab; // 폭죽 파티클 프리팹
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         lastAttackTime = -attackCooldown; // 시작 시 바로 공격할 수 있도록 설정
 
-        //CheckGunPresence();
+        CheckGunPresence(); // 총의 존재 여부를 확인하여 애니메이터 초기 상태 설정
 
         if (player != null)
         {
@@ -59,7 +61,7 @@ public class EnemyAI : MonoBehaviour
 
         LookAtPlayer();
 
-        //CheckGunPresence();
+        CheckGunPresence(); // 매 프레임마다 총의 존재 여부를 확인
         if (player != null)
         {
             agent.SetDestination(player.position);
@@ -81,12 +83,7 @@ public class EnemyAI : MonoBehaviour
                     AttackWithMelee();
                 }
             }
-            if (speed > 0.1f)
-            {
-                //Debug.Log("Transition to Unarmed_Walk should occur.");
-            }
         }
-        //Debug.Log("HasGun: " + hasGun);
     }
 
     void AttackWithMelee()
@@ -115,6 +112,8 @@ public class EnemyAI : MonoBehaviour
 
             GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.LookRotation(direction));
             Rigidbody rb = bullet.GetComponent<Rigidbody>();
+
+            animator.SetTrigger("Shoot");
 
             if (rb != null)
             {
@@ -166,20 +165,41 @@ public class EnemyAI : MonoBehaviour
         agent.isStopped = false;
     }
 
-    public void TakeDamage()
+    public void Die()
     {
-        if (!isDead)
+        if (!isDead)  // 사망 상태가 아닌 경우에만 처리
         {
-            StartCoroutine(Stun());
-            Die();
-        }
-    }
+            isDead = true;
+            agent.enabled = false; // NavMeshAgent를 비활성화합니다.
 
-    void Die()
-    {
-        isDead = true;
-        animator.SetTrigger("Death");
-        agent.enabled = false; // NavMeshAgent를 비활성화합니다.
+            // 폭죽 파티클 효과 생성
+            if (explosionParticlePrefab != null)
+            {
+                GameObject explosion = Instantiate(explosionParticlePrefab, transform.position, Quaternion.identity);
+                Debug.Log("Explosion particle instantiated."); // 디버그 메시지 추가
+
+                ParticleSystem ps = explosion.GetComponent<ParticleSystem>();
+                if (ps != null)
+                {
+                    ps.Play();
+                    Debug.Log("Explosion particle played."); // 디버그 메시지 추가
+
+                    // 파티클의 수명에 맞추어 파티클 오브젝트 제거
+                    Destroy(explosion, ps.main.duration + ps.main.startLifetime.constantMax);
+                }
+                else
+                {
+                    Debug.LogWarning("ParticleSystem component not found on explosion particle prefab.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Explosion particle prefab is not assigned.");
+            }
+
+            // 즉시 적 객체를 제거
+            Destroy(gameObject); // 적 객체를 즉시 제거
+        }
     }
 
     void HandlePlayerDeath()
@@ -201,6 +221,7 @@ public class EnemyAI : MonoBehaviour
         {
             hasGun = false; // pistol2가 null이면 총이 없는 상태로 설정
             animator.SetBool("HasGun", hasGun); // 애니메이터 상태 업데이트
+            Debug.Log("HasGun 상태: " + hasGun);
         }
     }
 
@@ -217,6 +238,12 @@ public class EnemyAI : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (other.CompareTag("ThrownPlayerPistol") || other.CompareTag("PlayerFist"))
+        {
+            // 피스톨 던지기 또는 근접 공격에 맞았을 때 스턴
+            StartCoroutine(Stun());
+        }
+
         if (other.gameObject.name.Contains("ThrownPlayerPistol"))
         {
             throwEnemyPistol();
@@ -244,6 +271,9 @@ public class EnemyAI : MonoBehaviour
             {
                 playerMovement.UpdateThrownEnemyPistol(goThrownEnemyPistol);
             }
+
+            // 피스톨을 던진 후 총의 존재 여부를 확인하여 상태 업데이트
+            CheckGunPresence();
         }
     }
 
@@ -251,6 +281,12 @@ public class EnemyAI : MonoBehaviour
     {
         Debug.Log(gameObject.name + " is now stunned.");  // 스턴 시작 디버그 메시지
         agent.isStopped = true;  // NavMeshAgent 이동 중지
+
+        animator.SetTrigger("Stun"); // 경직 애니메이션 트리거
+
+        // 피스톨 떨어뜨리기
+        throwEnemyPistol();
+
         yield return new WaitForSeconds(1.0f);  // 1초간 대기
         agent.isStopped = false;  // 이동 재개
         Debug.Log(gameObject.name + " has recovered from stun.");  // 스턴 해제 디버그 메시지

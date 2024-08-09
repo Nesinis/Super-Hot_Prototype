@@ -1767,6 +1767,7 @@ MonoBehaviour:
   thrownEnemyPistol: {fileID: 3763604498974455608, guid: 68c9f3a7fb43c994594484cc65bf4ad4, type: 3}
   throwRotaion: {fileID: 510942203}
   throwPower: 3
+  explosionParticlePrefab: {fileID: 8865089524319299132, guid: c9c2587dda1c39c4380d8efde3343a29, type: 3}
 --- !u!136 &829612637
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -3306,6 +3307,7 @@ MonoBehaviour:
   pistolPrefab: {fileID: 3763604498974455608, guid: 4df457ffa9035ae498b100e52188c1f7, type: 3}
   throwPos: {fileID: 738592137}
   throwPower: 15
+  punchRange: 0.2
 --- !u!1 &1660463617
 GameObject:
   m_ObjectHideFlags: 0
