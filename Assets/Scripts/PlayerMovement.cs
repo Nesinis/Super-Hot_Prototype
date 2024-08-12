@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -121,30 +122,46 @@ public class PlayerMovement : MonoBehaviour
             timeControl.UpdateTimeScale(isMoving);
         }
     }
-    void getPistol()
+    IEnumerator getPistolCoroutine()
     {
         if (ThrownEnemyPistol != null && PlayerPistol != null)
         {
-            // 1. 바닥에 있는 ThrownEnemyPistol이 일정 거리 내에 있는지 확인
             float distanceToPistol = Vector3.Distance(transform.position, ThrownEnemyPistol.transform.position);
 
             if (distanceToPistol <= pickupRange)
             {
-                // 2. PlayerPistol이 비활성화되어 있는 상태인지 확인
                 if (!PlayerPistol.activeInHierarchy)
                 {
-                    // 3. 마우스 좌클릭을 했는지 확인
                     if (Input.GetMouseButtonDown(0))
                     {
-                        // ThrownEnemyPistol을 비활성화하고, PlayerPistol을 활성화
                         ThrownEnemyPistol.SetActive(false);
+
+                        yield return new WaitForSeconds(0.1f); // 0.1초 대기
+
                         PlayerPistol.SetActive(true);
+
+                        PlayerFire playerFire = GetComponent<PlayerFire>();
+                        if (playerFire != null)
+                        {
+                            playerFire.ResetAmmoCount();
+                        }
+                        else
+                        {
+                            Debug.LogError("PlayerFire 스크립트를 Player 오브젝트에서 찾을 수 없습니다.");
+                        }
+
                         print("Pistol picked up and activated");
                     }
                 }
             }
         }
     }
+
+    void getPistol()
+    {
+        StartCoroutine(getPistolCoroutine()); // 코루틴 시작
+    }
+
     public void UpdateThrownEnemyPistol(GameObject thrownPistol)
     {
         ThrownEnemyPistol = thrownPistol;

@@ -37,7 +37,7 @@ public class EnemyAI : MonoBehaviour
         animator = GetComponent<Animator>();
         lastAttackTime = -attackCooldown; // 시작 시 바로 공격할 수 있도록 설정
 
-        //CheckGunPresence();
+        CheckGunPresence();
 
         if (player != null)
         {
@@ -59,7 +59,7 @@ public class EnemyAI : MonoBehaviour
 
         LookAtPlayer();
 
-        //CheckGunPresence();
+        CheckGunPresence();
         if (player != null)
         {
             agent.SetDestination(player.position);
@@ -195,7 +195,7 @@ public class EnemyAI : MonoBehaviour
         {
             hasGun = pistol2.activeInHierarchy; // 총의 존재 여부를 확인
             animator.SetBool("HasGun", hasGun); // 애니메이터 상태 업데이트
-            Debug.Log("HasGun 상태: " + hasGun);
+            //Debug.Log("HasGun 상태: " + hasGun);
         }
         else
         {
