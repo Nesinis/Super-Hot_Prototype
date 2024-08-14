@@ -33,10 +33,17 @@ public class EnemyAI : MonoBehaviour
 
     public GameObject explosionParticlePrefab; // 폭죽 파티클 프리팹
 
+    private AudioSource audioSource; // AudioSource 컴포넌트
+    public AudioClip deathSound; // 적 사망 사운드 클립
+    private bool isStunned = false; // 적이 경직 상태인지 여부를 확인하는 변수
+
+    public int punchHealth = 3; // 적의 펀치 공격에 대한 체력 변수
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>(); // AudioSource 컴포넌트 가져오기
         lastAttackTime = -attackCooldown; // 시작 시 바로 공격할 수 있도록 설정
 
         CheckGunPresence(); // 총의 존재 여부를 확인하여 애니메이터 초기 상태 설정
@@ -53,8 +60,8 @@ public class EnemyAI : MonoBehaviour
 
     void Update()
     {
-        if (isDead || playerIsDead)
-            return; // 적이나 플레이어가 죽었으면 업데이트를 중지합니다.
+        if (isDead || playerIsDead || isStunned)
+            return; // 적이나 플레이어가 죽었거나, 스턴 상태이면 업데이트를 중지합니다.
 
         if (isAttacking)
             return; // 공격 중이면 이동을 멈춥니다.
@@ -113,8 +120,6 @@ public class EnemyAI : MonoBehaviour
             GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.LookRotation(direction));
             Rigidbody rb = bullet.GetComponent<Rigidbody>();
 
-            animator.SetTrigger("Shoot");
-
             if (rb != null)
             {
                 rb.useGravity = false; // 중력 사용 비활성화
@@ -172,6 +177,12 @@ public class EnemyAI : MonoBehaviour
             isDead = true;
             agent.enabled = false; // NavMeshAgent를 비활성화합니다.
 
+            // 사망 사운드 재생
+            if (audioSource != null && deathSound != null)
+            {
+                audioSource.PlayOneShot(deathSound);
+            }
+
             // 폭죽 파티클 효과 생성
             if (explosionParticlePrefab != null)
             {
@@ -209,19 +220,19 @@ public class EnemyAI : MonoBehaviour
         animator.SetFloat("Speed", 0); // 이동 애니메이션을 멈춥니다.
     }
 
-    void CheckGunPresence()
+    public void CheckGunPresence()
     {
         if (pistol2 != null)
         {
             hasGun = pistol2.activeInHierarchy; // 총의 존재 여부를 확인
             animator.SetBool("HasGun", hasGun); // 애니메이터 상태 업데이트
-            Debug.Log("HasGun 상태: " + hasGun);
+            //Debug.Log("HasGun 상태: " + hasGun);
         }
         else
         {
             hasGun = false; // pistol2가 null이면 총이 없는 상태로 설정
             animator.SetBool("HasGun", hasGun); // 애니메이터 상태 업데이트
-            Debug.Log("HasGun 상태: " + hasGun);
+            //Debug.Log("HasGun 상태: " + hasGun);
         }
     }
 
@@ -238,7 +249,7 @@ public class EnemyAI : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("ThrownPlayerPistol") || other.CompareTag("PlayerFist"))
+        if (other.CompareTag("ThrownPlayerPistol") || other.CompareTag("Player"))
         {
             // 피스톨 던지기 또는 근접 공격에 맞았을 때 스턴
             StartCoroutine(Stun());
@@ -280,7 +291,12 @@ public class EnemyAI : MonoBehaviour
     public IEnumerator Stun()
     {
         Debug.Log(gameObject.name + " is now stunned.");  // 스턴 시작 디버그 메시지
-        agent.isStopped = true;  // NavMeshAgent 이동 중지
+
+        // NavMeshAgent가 유효한지 확인
+        if (agent != null)
+        {
+            agent.isStopped = true;  // NavMeshAgent 이동 중지
+        }
 
         animator.SetTrigger("Stun"); // 경직 애니메이션 트리거
 
@@ -288,7 +304,23 @@ public class EnemyAI : MonoBehaviour
         throwEnemyPistol();
 
         yield return new WaitForSeconds(1.0f);  // 1초간 대기
-        agent.isStopped = false;  // 이동 재개
-        Debug.Log(gameObject.name + " has recovered from stun.");  // 스턴 해제 디버그 메시지
+
+        // 다시 NavMeshAgent가 유효한지 확인
+        if (agent != null)
+        {
+            agent.isStopped = false;  // 이동 재개
+        }
+
+    }
+
+    public void TakePunchDamage()
+    {
+        punchHealth--; // 펀치 공격에 맞으면 체력을 감소시킵니다.
+        Debug.Log(gameObject.name + " takes punch damage. Remaining punch health: " + punchHealth);
+
+        if (punchHealth <= 0)
+        {
+            Die(); // 체력이 0 이하가 되면 사망 처리
+        }
     }
 }

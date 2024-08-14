@@ -11,12 +11,21 @@ public class PlayerFire : MonoBehaviour
     public float throwPower = 20f; // 피스톨을 던지는 힘
     public float punchRange = 0.2f; // 근접 공격 범위
 
+    private AudioSource audioSource; // AudioSource 컴포넌트
+    public AudioClip shootSound; // 총 발사 사운드 클립
+
+    void Start()
+    {
+        // AudioSource 컴포넌트 가져오기
+        audioSource = GetComponent<AudioSource>();
+    }
+
     void Update()
     {
         // Fire1 버튼이 눌렸을 때
         if (Input.GetButtonDown("Fire1"))
         {
-            if (PlayerPistol == null)
+            if (PlayerPistol == null || !PlayerPistol.activeSelf) // 피스톨이 없거나 비활성화된 경우
             {
                 // 피스톨이 없으면 근접 공격을 실행
                 FistAttack();
@@ -29,7 +38,7 @@ public class PlayerFire : MonoBehaviour
         }
 
         // 마우스 오른쪽 버튼이 눌렸고 피스톨이 있을 때
-        if (Input.GetMouseButtonDown(1) && PlayerPistol != null)
+        if (Input.GetMouseButtonDown(1) && PlayerPistol != null && PlayerPistol.activeSelf)
         {
             // 피스톨을 던짐
             throwPistol();
@@ -55,6 +64,7 @@ public class PlayerFire : MonoBehaviour
                     // 적을 스턴 상태로 만들고 총을 던지게 함
                     StartCoroutine(enemyAI.Stun());  // Enemy 스턴 적용
                     enemyAI.throwEnemyPistol();  // 적의 총을 던지는 함수 호출
+                    enemyAI.TakePunchDamage(); // 적에게 펀치 데미지를 입힘
                     Debug.Log("Enemy stunned and pistol thrown: " + hit.collider.gameObject.name); // 스턴 및 피스톨 던지기 적용 디버그 메시지
                 }
             }
@@ -68,8 +78,8 @@ public class PlayerFire : MonoBehaviour
     // 총을 발사하는 메소드
     void bulletFire1()
     {
-        // 피스톨이 존재하는지 확인
-        if (PlayerPistol != null)
+        // 피스톨이 활성화된 경우에만 발사
+        if (PlayerPistol != null && PlayerPistol.activeSelf)
         {
             // 메인 카메라의 정면 방향으로 총알을 발사
             Vector3 shootDirection = Camera.main.transform.forward;
@@ -80,8 +90,17 @@ public class PlayerFire : MonoBehaviour
             {
                 // 총알에 발사 방향 설정
                 bulletMove.SetDirection(shootDirection);
-                //print(shootDirection.ToString());
             }
+
+            // 총 발사 사운드 재생
+            if (audioSource != null && shootSound != null)
+            {
+                audioSource.PlayOneShot(shootSound);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("PlayerPistol is null or not active, cannot fire.");
         }
     }
 
