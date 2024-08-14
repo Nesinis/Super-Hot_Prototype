@@ -2,23 +2,20 @@ using UnityEngine;
 
 public class TimeControl : MonoBehaviour
 {
-    // Player 이동 속도 변수
     public float moveSpeed = 5f;
-
-    // 시간 스케일 변수
     private float timeScale = 0f;
+    public float smoothTime = 0.002f;
 
-    // 시간 변화 속도
-    public float smoothTime = 0.1f;
-
-    // 목표 시간 스케일
-    public float targetTimeScale = 1f;
-
-    // 최소 시간 스케일
-    public float minTimeScale = 0.1f;
-
-    // 최대 시간 스케일
+    public float targetTimeScale = 0.001f; // 게임 시작 시 느리게 시작
+    public float minTimeScale = 0.001f;
     public float maxTimeScale = 1f;
+
+    private void Start()
+    {
+        // 초기 시간 스케일을 느리게 설정
+        Time.timeScale = minTimeScale;
+        timeScale = minTimeScale;
+    }
 
     private void Update()
     {
@@ -29,19 +26,23 @@ public class TimeControl : MonoBehaviour
         Time.timeScale = timeScale;
     }
 
-  
-
     public void UpdateTimeScale(bool isPlayerMoving)
     {
         if (isPlayerMoving)
         {
-            // 플레이어가 움직이고 있다면 목표 시간 스케일을 최대로 설정
-            targetTimeScale = maxTimeScale;
+            if (targetTimeScale != maxTimeScale)
+            {
+                Debug.Log("Player is moving. Setting targetTimeScale to maxTimeScale.");
+            }
+            targetTimeScale = maxTimeScale; // 플레이어가 움직이고 있을 때는 시간을 정상 속도로 설정
         }
         else
         {
-            // 그렇지 않다면 목표 시간 스케일을 최소로 설정
-            targetTimeScale = minTimeScale;
+            if (targetTimeScale != minTimeScale)
+            {
+                Debug.Log("Player is not moving. Setting targetTimeScale to minTimeScale.");
+            }
+            targetTimeScale = minTimeScale; // 플레이어가 움직이지 않을 때는 시간을 느리게 설정
         }
     }
 }

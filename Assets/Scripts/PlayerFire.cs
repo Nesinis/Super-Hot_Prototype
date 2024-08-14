@@ -11,20 +11,20 @@ public class PlayerFire : MonoBehaviour
     public float throwPower = 20f; // 피스톨을 던지는 힘
     public float punchRange = 0.2f; // 근접 공격 범위
 
-    private AudioSource audioSource; // AudioSource 컴포넌트
-    public AudioClip shootSound; // 총 발사 사운드 클립
+    private int ammoCount = 5; // 최대 발사 가능한 탄약 수
 
-    void Start()
-    {
-        // AudioSource 컴포넌트 가져오기
-        audioSource = GetComponent<AudioSource>();
-    }
 
     void Update()
     {
         // Fire1 버튼이 눌렸을 때
         if (Input.GetButtonDown("Fire1"))
         {
+            // 피스톨이 없으면 근접 공격을 실행
+            FistAttack();
+            
+            // 피스톨이 있으면 총을 발사
+            bulletFire1();
+        }
             if (PlayerPistol == null || !PlayerPistol.activeSelf) // 피스톨이 없거나 비활성화된 경우
             {
                 // 피스톨이 없으면 근접 공격을 실행
@@ -47,12 +47,19 @@ public class PlayerFire : MonoBehaviour
 
     // 근접 공격을 수행하는 메소드
     void FistAttack()
-    {
-        RaycastHit hit;
-        // 플레이어의 정면으로 레이캐스트를 쏘아 충돌 여부를 확인
-        if (Physics.Raycast(transform.position, transform.forward, out hit, punchRange))
+    {   
+        // Player 오브젝트의 자식인 PlayerPistol 오브젝트를 찾음
+        GameObject playerPistol = transform.Find("PlayerPistol").gameObject;
+
+        if (!playerPistol.activeSelf)
         {
-            Debug.Log("Raycast hit: " + hit.collider.gameObject.name); // 충돌한 객체의 이름을 로그로 출력
+            if (Input.GetButtonDown("Fire1"))
+            {
+                RaycastHit hit;
+                // 플레이어의 정면으로 레이캐스트를 쏘아 충돌 여부를 확인
+                if (Physics.Raycast(transform.position, transform.forward, out hit, punchRange))
+                {
+                    Debug.Log("Raycast hit: " + hit.collider.gameObject.name); // 충돌한 객체의 이름을 로그로 출력
 
             // 충돌한 객체가 'Enemy' 태그를 가지고 있는 경우
             if (hit.collider.gameObject.CompareTag("Enemy"))
@@ -78,29 +85,33 @@ public class PlayerFire : MonoBehaviour
     // 총을 발사하는 메소드
     void bulletFire1()
     {
-        // 피스톨이 활성화된 경우에만 발사
-        if (PlayerPistol != null && PlayerPistol.activeSelf)
+        // PlayerPistol이 활성화 상태인지 확인하고, 탄약이 남아 있는지 확인
+        if (PlayerPistol != null && PlayerPistol.activeInHierarchy && ammoCount > 0)
         {
-            // 메인 카메라의 정면 방향으로 총알을 발사
-            Vector3 shootDirection = Camera.main.transform.forward;
-            // 총알 인스턴스를 생성하고 위치와 회전을 설정
-            GameObject bulletInstance = Instantiate(bulletPrefab, firePosition.transform.position, firePosition.transform.rotation);
-            BulletMove bulletMove = bulletInstance.GetComponent<BulletMove>();
-            if (bulletMove != null)
+            // Fire1 버튼이 눌렸을 때
+            if (Input.GetButtonDown("Fire1"))
             {
-                // 총알에 발사 방향 설정
-                bulletMove.SetDirection(shootDirection);
-            }
+                // 메인 카메라의 정면 방향으로 총알을 발사
+                Vector3 shootDirection = Camera.main.transform.forward;
+                // 총알 인스턴스를 생성하고 위치와 회전을 설정
+                GameObject bulletInstance = Instantiate(bulletPrefab, firePosition.transform.position, Quaternion.identity);
+                BulletMove bulletMove = bulletInstance.GetComponent<BulletMove>();
+                if (bulletMove != null)
+                {
+                    // 총알에 발사 방향 설정
+                    bulletMove.SetDirection(shootDirection);
+                    //print(shootDirection.ToString());
+                }
 
-            // 총 발사 사운드 재생
-            if (audioSource != null && shootSound != null)
-            {
-                audioSource.PlayOneShot(shootSound);
+                // 탄약 감소
+                ammoCount--;
+
+                Debug.Log("Bullet fired! Remaining ammo: " + ammoCount);
             }
         }
         else
         {
-            Debug.LogWarning("PlayerPistol is null or not active, cannot fire.");
+            Debug.Log("Cannot fire. Either no PlayerPistol or no ammo left.");
         }
     }
 
@@ -120,5 +131,11 @@ public class PlayerFire : MonoBehaviour
                 rb.AddForce(throwDir * throwPower, ForceMode.Impulse);
             }
         }
+    }
+    public void ResetAmmoCount()
+    {
+        ammoCount = 5; 
+        print("RESET!");
+
     }
 }
