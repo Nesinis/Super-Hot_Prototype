@@ -609,6 +609,9 @@ MonoBehaviour:
   thrownEnemyPistol: {fileID: 3763604498974455608, guid: 68c9f3a7fb43c994594484cc65bf4ad4, type: 3}
   throwRotaion: {fileID: 722348470}
   throwPower: 3
+  explosionParticlePrefab: {fileID: 0}
+  deathSound: {fileID: 0}
+  punchHealth: 3
 --- !u!54 &212947077
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2610,6 +2613,9 @@ MonoBehaviour:
   thrownEnemyPistol: {fileID: 3763604498974455608, guid: 68c9f3a7fb43c994594484cc65bf4ad4, type: 3}
   throwRotaion: {fileID: 510942203}
   throwPower: 3
+  explosionParticlePrefab: {fileID: 0}
+  deathSound: {fileID: 0}
+  punchHealth: 3
 --- !u!136 &829612637
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2910,6 +2916,9 @@ MonoBehaviour:
   thrownEnemyPistol: {fileID: 3763604498974455608, guid: 68c9f3a7fb43c994594484cc65bf4ad4, type: 3}
   throwRotaion: {fileID: 232324259}
   throwPower: 3
+  explosionParticlePrefab: {fileID: 0}
+  deathSound: {fileID: 0}
+  punchHealth: 3
 --- !u!54 &979919708
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3449,6 +3458,7 @@ GameObject:
   - component: {fileID: 1142931512}
   - component: {fileID: 1142931511}
   - component: {fileID: 1142931510}
+  - component: {fileID: 1142931513}
   m_Layer: 5
   m_Name: IntroVideo
   m_TagString: Untagged
@@ -3522,6 +3532,42 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1142931508}
   m_CullTransparentMesh: 1
+--- !u!328 &1142931513
+VideoPlayer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142931508}
+  m_Enabled: 1
+  m_VideoClip: {fileID: 0}
+  m_TargetCameraAlpha: 1
+  m_TargetCamera3DLayout: 0
+  m_TargetCamera: {fileID: 0}
+  m_TargetTexture: {fileID: 0}
+  m_TimeReference: 0
+  m_TargetMaterialRenderer: {fileID: 0}
+  m_TargetMaterialProperty: <noninit>
+  m_RenderMode: 2
+  m_AspectRatio: 2
+  m_DataSource: 0
+  m_TimeUpdateMode: 2
+  m_PlaybackSpeed: 1
+  m_AudioOutputMode: 2
+  m_TargetAudioSources:
+  - {fileID: 0}
+  m_DirectAudioVolumes:
+  - 1
+  m_Url: 
+  m_EnabledAudioTracks: 01
+  m_DirectAudioMutes: 00
+  m_ControlledAudioTrackCount: 1
+  m_PlayOnAwake: 1
+  m_SkipOnDrop: 1
+  m_Looping: 0
+  m_WaitForFirstFrame: 1
+  m_FrameReadyEventEnabled: 0
+  m_VideoShaders: []
 --- !u!1 &1190286634
 GameObject:
   m_ObjectHideFlags: 0
@@ -4576,6 +4622,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6336684166728618931, guid: 6943fbcfa6ca8fc4898224d6302b5577, type: 3}
+      propertyPath: punchOrigin
+      value: 
+      objectReference: {fileID: 738592137}
+    - target: {fileID: 6336684166728618931, guid: 6943fbcfa6ca8fc4898224d6302b5577, type: 3}
       propertyPath: PlayerPistol
       value: 
       objectReference: {fileID: 1743219848}
@@ -4976,6 +5026,9 @@ MonoBehaviour:
   thrownEnemyPistol: {fileID: 3763604498974455608, guid: 68c9f3a7fb43c994594484cc65bf4ad4, type: 3}
   throwRotaion: {fileID: 473432327}
   throwPower: 3
+  explosionParticlePrefab: {fileID: 0}
+  deathSound: {fileID: 0}
+  punchHealth: 3
 --- !u!54 &1713118108
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5984,6 +6037,9 @@ MonoBehaviour:
   thrownEnemyPistol: {fileID: 3763604498974455608, guid: 68c9f3a7fb43c994594484cc65bf4ad4, type: 3}
   throwRotaion: {fileID: 17141582}
   throwPower: 3
+  explosionParticlePrefab: {fileID: 0}
+  deathSound: {fileID: 0}
+  punchHealth: 3
 --- !u!54 &2095754446
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6093,6 +6149,9 @@ MonoBehaviour:
   thrownEnemyPistol: {fileID: 3763604498974455608, guid: 68c9f3a7fb43c994594484cc65bf4ad4, type: 3}
   throwRotaion: {fileID: 5100596}
   throwPower: 3
+  explosionParticlePrefab: {fileID: 0}
+  deathSound: {fileID: 0}
+  punchHealth: 3
 --- !u!54 &2101468161
 Rigidbody:
   m_ObjectHideFlags: 0

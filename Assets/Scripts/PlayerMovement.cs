@@ -29,17 +29,13 @@ public class PlayerMovement : MonoBehaviour
     private bool isMoving = false;
     private bool isJumping = false;
 
-
     public GameObject PlayerPistol; // 플레이어가 들고 있는 총
     private GameObject ThrownEnemyPistol;
     public float pickupRange = 2.0f; // 총을 집을 수 있는 범위
 
-<<<<<<< Updated upstream
-=======
     public Transform punchOrigin; // 주먹 공격의 시작 지점
     public float punchRange = 1.0f; // 주먹 공격의 범위
 
->>>>>>> Stashed changes
     void Start()
     {
         // CharacterController 컴포넌트를 가져온다
@@ -65,10 +61,7 @@ public class PlayerMovement : MonoBehaviour
         UpdateTimeControl();
 
         getPistol(); // 플레이어가 총을 잡는다.
-<<<<<<< Updated upstream
-=======
         HandleAttack(); // 플레이어 공격 처리
->>>>>>> Stashed changes
     }
 
     void HandleRotation()
@@ -175,8 +168,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-<<<<<<< Updated upstream
-=======
     void HandleAttack()
     {
         if (PlayerPistol != null && PlayerPistol.activeInHierarchy)
@@ -202,6 +193,20 @@ public class PlayerMovement : MonoBehaviour
     void getPistol()
     {
         StartCoroutine(getPistolCoroutine()); // 코루틴 시작
+    }
+
+    void Punch()
+    {
+        // 주먹 공격을 할 때 적과 충돌을 감지
+        RaycastHit hit;
+        if (Physics.Raycast(punchOrigin.position, punchOrigin.forward, out hit, punchRange))
+        {
+            EnemyAI enemy = hit.collider.GetComponent<EnemyAI>();
+            if (enemy != null)
+            {
+                enemy.TakePunchDamage(); // 적에게 펀치 데미지를 입힘
+            }
+        }
     }
 
     public void UpdateThrownEnemyPistol(GameObject thrownPistol)

@@ -31,13 +31,22 @@ public class EnemyAI : MonoBehaviour
     public GameObject throwRotaion;
     public float throwPower = 3f;
 
+    public GameObject explosionParticlePrefab; // 폭죽 파티클 프리팹
+
+    private AudioSource audioSource; // AudioSource 컴포넌트
+    public AudioClip deathSound; // 적 사망 사운드 클립
+    private bool isStunned = false; // 적이 경직 상태인지 여부를 확인하는 변수
+
+    public int punchHealth = 3; // 적의 펀치 공격에 대한 체력 변수
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>(); // AudioSource 컴포넌트 가져오기
         lastAttackTime = -attackCooldown; // 시작 시 바로 공격할 수 있도록 설정
 
-        CheckGunPresence();
+        CheckGunPresence(); // 총의 존재 여부를 확인하여 애니메이터 초기 상태 설정
 
         if (player != null)
         {
@@ -51,15 +60,15 @@ public class EnemyAI : MonoBehaviour
 
     void Update()
     {
-        if (isDead || playerIsDead)
-            return; // 적이나 플레이어가 죽었으면 업데이트를 중지합니다.
+        if (isDead || playerIsDead || isStunned)
+            return; // 적이나 플레이어가 죽었거나, 스턴 상태이면 업데이트를 중지합니다.
 
         if (isAttacking)
             return; // 공격 중이면 이동을 멈춥니다.
 
         LookAtPlayer();
 
-        CheckGunPresence();
+        CheckGunPresence(); // 매 프레임마다 총의 존재 여부를 확인
         if (player != null)
         {
             agent.SetDestination(player.position);
@@ -81,12 +90,15 @@ public class EnemyAI : MonoBehaviour
                     AttackWithMelee();
                 }
             }
-            if (speed > 0.1f)
-            {
-                //Debug.Log("Transition to Unarmed_Walk should occur.");
-            }
         }
-        //Debug.Log("HasGun: " + hasGun);
+        if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
+        {
+            agent.isStopped = true;  // 이동 중지
+        }
+        else
+        {
+            Debug.LogWarning("NavMeshAgent is either not active or not placed on a NavMesh.");
+        }
     }
 
     void AttackWithMelee()
@@ -166,20 +178,47 @@ public class EnemyAI : MonoBehaviour
         agent.isStopped = false;
     }
 
-    public void TakeDamage()
+    public void Die()
     {
-        if (!isDead)
+        if (!isDead)  // 사망 상태가 아닌 경우에만 처리
         {
-            StartCoroutine(Stun());
-            Die();
-        }
-    }
+            isDead = true;
+            agent.enabled = false; // NavMeshAgent를 비활성화합니다.
 
-    void Die()
-    {
-        isDead = true;
-        animator.SetTrigger("Death");
-        agent.enabled = false; // NavMeshAgent를 비활성화합니다.
+            // 사망 사운드 재생
+            if (audioSource != null && deathSound != null)
+            {
+                audioSource.PlayOneShot(deathSound);
+            }
+
+            // 폭죽 파티클 효과 생성
+            if (explosionParticlePrefab != null)
+            {
+                GameObject explosion = Instantiate(explosionParticlePrefab, transform.position, Quaternion.identity);
+                Debug.Log("Explosion particle instantiated."); // 디버그 메시지 추가
+
+                ParticleSystem ps = explosion.GetComponent<ParticleSystem>();
+                if (ps != null)
+                {
+                    ps.Play();
+                    Debug.Log("Explosion particle played."); // 디버그 메시지 추가
+
+                    // 파티클의 수명에 맞추어 파티클 오브젝트 제거
+                    Destroy(explosion, ps.main.duration + ps.main.startLifetime.constantMax);
+                }
+                else
+                {
+                    Debug.LogWarning("ParticleSystem component not found on explosion particle prefab.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Explosion particle prefab is not assigned.");
+            }
+
+            // 즉시 적 객체를 제거
+            Destroy(gameObject); // 적 객체를 즉시 제거
+        }
     }
 
     void HandlePlayerDeath()
@@ -189,7 +228,7 @@ public class EnemyAI : MonoBehaviour
         animator.SetFloat("Speed", 0); // 이동 애니메이션을 멈춥니다.
     }
 
-    void CheckGunPresence()
+    public void CheckGunPresence()
     {
         if (pistol2 != null)
         {
@@ -201,6 +240,7 @@ public class EnemyAI : MonoBehaviour
         {
             hasGun = false; // pistol2가 null이면 총이 없는 상태로 설정
             animator.SetBool("HasGun", hasGun); // 애니메이터 상태 업데이트
+            //Debug.Log("HasGun 상태: " + hasGun);
         }
     }
 
@@ -217,6 +257,12 @@ public class EnemyAI : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (other.CompareTag("ThrownPlayerPistol") || other.CompareTag("Player"))
+        {
+            // 피스톨 던지기 또는 근접 공격에 맞았을 때 스턴
+            StartCoroutine(Stun());
+        }
+
         if (other.gameObject.name.Contains("ThrownPlayerPistol"))
         {
             throwEnemyPistol();
@@ -244,15 +290,70 @@ public class EnemyAI : MonoBehaviour
             {
                 playerMovement.UpdateThrownEnemyPistol(goThrownEnemyPistol);
             }
+
+            // 피스톨을 던진 후 총의 존재 여부를 확인하여 상태 업데이트
+            CheckGunPresence();
         }
     }
 
     public IEnumerator Stun()
     {
         Debug.Log(gameObject.name + " is now stunned.");  // 스턴 시작 디버그 메시지
-        agent.isStopped = true;  // NavMeshAgent 이동 중지
+
+        // 현재 객체가 파괴되었는지 확인
+        if (this == null)
+        {
+            Debug.LogWarning("EnemyAI object has been destroyed. Exiting Stun coroutine.");
+            yield break;  // 코루틴 종료
+        }
+
+        // NavMeshAgent가 유효하고 활성화된 경우에만 이동 중지를 설정합니다.
+        if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
+        {
+            agent.isStopped = true;  // NavMeshAgent 이동 중지
+        }
+        else
+        {
+            Debug.LogWarning("NavMeshAgent is not active or not placed on a NavMesh. Cannot stop agent.");
+        }
+
+        animator.SetTrigger("Stun"); // 경직 애니메이션 트리거
+
+        // 피스톨 떨어뜨리기
+        throwEnemyPistol();
+
         yield return new WaitForSeconds(1.0f);  // 1초간 대기
-        agent.isStopped = false;  // 이동 재개
+
+        // 현재 객체가 파괴되었는지 확인
+        if (this == null)
+        {
+            Debug.LogWarning("EnemyAI object has been destroyed during stun. Exiting coroutine.");
+            yield break;  // 코루틴 종료
+        }
+
+        // NavMeshAgent가 유효하고 활성화된 경우에만 이동 재개를 설정합니다.
+        if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
+        {
+            agent.isStopped = false;  // 이동 재개
+        }
+        else
+        {
+            Debug.LogWarning("NavMeshAgent is not active or not placed on a NavMesh. Cannot resume agent.");
+        }
+
         Debug.Log(gameObject.name + " has recovered from stun.");  // 스턴 해제 디버그 메시지
+    }
+
+
+
+    public void TakePunchDamage()
+    {
+        punchHealth--; // 펀치 공격에 맞으면 체력을 감소시킵니다.
+        Debug.Log(gameObject.name + " takes punch damage. Remaining punch health: " + punchHealth);
+
+        if (punchHealth <= 0)
+        {
+            Die(); // 체력이 0 이하가 되면 사망 처리
+        }
     }
 }
