@@ -188,8 +188,6 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
-
->>>>>>> Stashed changes
     void getPistol()
     {
         StartCoroutine(getPistolCoroutine()); // 코루틴 시작

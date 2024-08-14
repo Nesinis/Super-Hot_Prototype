@@ -18,7 +18,6 @@ public class PlayerFire : MonoBehaviour
         // Fire1 버튼이 눌렸을 때
         if (Input.GetButtonDown("Fire1"))
         {
-<<<<<<< Updated upstream
             // 피스톨이 없으면 근접 공격을 실행
             if (PlayerPistol == null || !PlayerPistol.activeSelf)
             {
@@ -92,10 +91,11 @@ public class PlayerFire : MonoBehaviour
                     Debug.Log("Bullet Direction: " + shootDirection);
                 }
 
-            // 탄약 감소
-            ammoCount--;
+                // 탄약 감소
+                ammoCount--;
 
-            Debug.Log("Bullet fired! Remaining ammo: " + ammoCount);
+                Debug.Log("Bullet fired! Remaining ammo: " + ammoCount);
+            }
         }
         else
         {
