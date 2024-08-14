@@ -34,6 +34,12 @@ public class PlayerMovement : MonoBehaviour
     private GameObject ThrownEnemyPistol;
     public float pickupRange = 2.0f; // 총을 집을 수 있는 범위
 
+<<<<<<< Updated upstream
+=======
+    public Transform punchOrigin; // 주먹 공격의 시작 지점
+    public float punchRange = 1.0f; // 주먹 공격의 범위
+
+>>>>>>> Stashed changes
     void Start()
     {
         // CharacterController 컴포넌트를 가져온다
@@ -59,6 +65,10 @@ public class PlayerMovement : MonoBehaviour
         UpdateTimeControl();
 
         getPistol(); // 플레이어가 총을 잡는다.
+<<<<<<< Updated upstream
+=======
+        HandleAttack(); // 플레이어 공격 처리
+>>>>>>> Stashed changes
     }
 
     void HandleRotation()
@@ -96,11 +106,6 @@ public class PlayerMovement : MonoBehaviour
         controller.Move(move * moveSpeed * Time.deltaTime);
     }
 
-    //bool IsGrounded()
-    //{
-    //    return Physics.Raycast(transform.position, Vector3.down, controller.height / 2 + 0.1f);
-    //}
-
     void HandleJumpAndGravity()
     {
         if (controller.isGrounded && velocity.y < 0)
@@ -134,6 +139,7 @@ public class PlayerMovement : MonoBehaviour
             timeControl.UpdateTimeScale(currentMovingState);
         }
     }
+
     IEnumerator getPistolCoroutine()
     {
         if (ThrownEnemyPistol != null && PlayerPistol != null)
@@ -169,6 +175,30 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+<<<<<<< Updated upstream
+=======
+    void HandleAttack()
+    {
+        if (PlayerPistol != null && PlayerPistol.activeInHierarchy)
+        {
+            // 총이 활성화되어 있을 때는 총으로 공격
+            if (Input.GetButtonDown("Fire1"))
+            {
+                Debug.Log("총 발사!");
+            }
+        }
+        else
+        {
+            // 총이 없을 때는 주먹으로 공격
+            if (Input.GetButtonDown("Fire1"))
+            {
+                Debug.Log("주먹 공격!");
+                Punch();
+            }
+        }
+    }
+
+>>>>>>> Stashed changes
     void getPistol()
     {
         StartCoroutine(getPistolCoroutine()); // 코루틴 시작
