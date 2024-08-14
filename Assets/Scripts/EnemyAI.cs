@@ -91,6 +91,14 @@ public class EnemyAI : MonoBehaviour
                 }
             }
         }
+        if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
+        {
+            agent.isStopped = true;  // 이동 중지
+        }
+        else
+        {
+            Debug.LogWarning("NavMeshAgent is either not active or not placed on a NavMesh.");
+        }
     }
 
     void AttackWithMelee()
@@ -292,10 +300,21 @@ public class EnemyAI : MonoBehaviour
     {
         Debug.Log(gameObject.name + " is now stunned.");  // 스턴 시작 디버그 메시지
 
-        // NavMeshAgent가 유효한지 확인
-        if (agent != null)
+        // 현재 객체가 파괴되었는지 확인
+        if (this == null)
+        {
+            Debug.LogWarning("EnemyAI object has been destroyed. Exiting Stun coroutine.");
+            yield break;  // 코루틴 종료
+        }
+
+        // NavMeshAgent가 유효하고 활성화된 경우에만 이동 중지를 설정합니다.
+        if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
         {
             agent.isStopped = true;  // NavMeshAgent 이동 중지
+        }
+        else
+        {
+            Debug.LogWarning("NavMeshAgent is not active or not placed on a NavMesh. Cannot stop agent.");
         }
 
         animator.SetTrigger("Stun"); // 경직 애니메이션 트리거
@@ -305,13 +324,27 @@ public class EnemyAI : MonoBehaviour
 
         yield return new WaitForSeconds(1.0f);  // 1초간 대기
 
-        // 다시 NavMeshAgent가 유효한지 확인
-        if (agent != null)
+        // 현재 객체가 파괴되었는지 확인
+        if (this == null)
+        {
+            Debug.LogWarning("EnemyAI object has been destroyed during stun. Exiting coroutine.");
+            yield break;  // 코루틴 종료
+        }
+
+        // NavMeshAgent가 유효하고 활성화된 경우에만 이동 재개를 설정합니다.
+        if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
         {
             agent.isStopped = false;  // 이동 재개
         }
+        else
+        {
+            Debug.LogWarning("NavMeshAgent is not active or not placed on a NavMesh. Cannot resume agent.");
+        }
 
+        Debug.Log(gameObject.name + " has recovered from stun.");  // 스턴 해제 디버그 메시지
     }
+
+
 
     public void TakePunchDamage()
     {
