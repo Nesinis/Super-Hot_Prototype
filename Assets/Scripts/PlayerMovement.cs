@@ -25,14 +25,14 @@ public class PlayerMovement : MonoBehaviour
     private float verticalRotation = 0f;
     // 이전 프레임의 Y 위치를 저장하는 변수
     private float lastYPosition;
-    // 플레이어의 이동 상태를 저장하는 변수
+    // 플레이어의 이동/점프 상태를 저장하는 변수
     private bool isMoving = false;
+    private bool isJumping = false;
 
 
     public GameObject PlayerPistol; // 플레이어가 들고 있는 총
     private GameObject ThrownEnemyPistol;
     public float pickupRange = 2.0f; // 총을 집을 수 있는 범위
-
 
     void Start()
     {
@@ -55,7 +55,6 @@ public class PlayerMovement : MonoBehaviour
         HandleMovement();
         // 점프와 중력 처리
         HandleJumpAndGravity();
-
         // 시간 조절 업데이트
         UpdateTimeControl();
 
@@ -79,47 +78,60 @@ public class PlayerMovement : MonoBehaviour
 
     void HandleMovement()
     {
-        // 수평과 수직 입력값을 받는다
         float moveX = Input.GetAxis("Horizontal");
         float moveZ = Input.GetAxis("Vertical");
 
-        // 입력값을 기반하여 이동 방향을 설정
         Vector3 move = transform.right * moveX + transform.forward * moveZ;
-        // CharacterController를 사용하여 이동값을 처리
-        controller.Move(move * moveSpeed * Time.deltaTime);
 
-        // 이동 상태 업데이트
-        isMoving = (moveX != 0 || moveZ != 0);
+        // 이동이 발생하는지 감지
+        if (move.magnitude > 0)
+        {
+            isMoving = true;
+        }
+        else
+        {
+            isMoving = false;
+        }
+
+        controller.Move(move * moveSpeed * Time.deltaTime);
     }
+
+    //bool IsGrounded()
+    //{
+    //    return Physics.Raycast(transform.position, Vector3.down, controller.height / 2 + 0.1f);
+    //}
 
     void HandleJumpAndGravity()
     {
-        // 점프 처리
+        if (controller.isGrounded && velocity.y < 0)
+        {
+            velocity.y = -2f;
+            isJumping = false; // 착지 시 점프 상태 해제
+        }
+
         if (controller.isGrounded && Input.GetButtonDown("Jump"))
         {
             velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
-            isMoving = true;
+            isJumping = true; // 점프 시 상태 업데이트
+            isMoving = true;  // 점프 시에도 이동 중으로 간주
         }
 
-        // 중력 적용
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
 
-        // 수직 이동 확인
-        float currentYPosition = transform.position.y;
-        if (Mathf.Abs(currentYPosition - lastYPosition) > 1f)
+        if (!controller.isGrounded)
         {
-            isMoving = true;
+            isMoving = true; // 공중에 있을 때는 이동 중으로 간주
         }
-        lastYPosition = currentYPosition;
     }
 
     void UpdateTimeControl()
     {
-        // TimeControl 스크립트에 플레이어 이동 상태 전달
         if (timeControl != null)
         {
-            timeControl.UpdateTimeScale(isMoving);
+            // 한 프레임 내에서 isMoving 상태가 일관되게 유지되도록
+            bool currentMovingState = isMoving;
+            timeControl.UpdateTimeScale(currentMovingState);
         }
     }
     IEnumerator getPistolCoroutine()
