@@ -62,6 +62,7 @@ public class PlayerMovement : MonoBehaviour
 
         getPistol(); // 플레이어가 총을 잡는다.
         HandleAttack(); // 플레이어 공격 처리
+
     }
 
     void HandleRotation()
@@ -101,17 +102,23 @@ public class PlayerMovement : MonoBehaviour
 
     void HandleJumpAndGravity()
     {
-        if (controller.isGrounded && velocity.y < 0)
+        if (controller.isGrounded)
         {
             velocity.y = -2f;
             isJumping = false; // 착지 시 점프 상태 해제
         }
-
-        if (controller.isGrounded && Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("Jump")) 
         {
-            velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
-            isJumping = true; // 점프 시 상태 업데이트
-            isMoving = true;  // 점프 시에도 이동 중으로 간주
+            Debug.Log("점프버튼 클릭됨");
+
+            if (controller.isGrounded)
+            {
+                Debug.Log("땅에 닿아 있다고 인식됨--");
+
+                velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
+                isJumping = true; // 점프 시 상태 업데이트
+                isMoving = true;  // 점프 시에도 이동 중으로 간주
+            }
         }
 
         velocity.y += gravity * Time.deltaTime;

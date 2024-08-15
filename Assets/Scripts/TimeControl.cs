@@ -32,7 +32,7 @@ public class TimeControl : MonoBehaviour
         {
             if (targetTimeScale != maxTimeScale)
             {
-                Debug.Log("Player is moving. Setting targetTimeScale to maxTimeScale.");
+                //Debug.Log("Player is moving. Setting targetTimeScale to maxTimeScale.");
             }
             targetTimeScale = maxTimeScale; // 플레이어가 움직이고 있을 때는 시간을 정상 속도로 설정
         }
@@ -40,7 +40,7 @@ public class TimeControl : MonoBehaviour
         {
             if (targetTimeScale != minTimeScale)
             {
-                Debug.Log("Player is not moving. Setting targetTimeScale to minTimeScale.");
+                //Debug.Log("Player is not moving. Setting targetTimeScale to minTimeScale.");
             }
             targetTimeScale = minTimeScale; // 플레이어가 움직이지 않을 때는 시간을 느리게 설정
         }

@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Video;
 
 public class PlayerFire : MonoBehaviour
 {
@@ -12,6 +14,14 @@ public class PlayerFire : MonoBehaviour
     public float punchRange = 0.2f; // 근접 공격 범위
 
     private int ammoCount = 5; // 최대 발사 가능한 탄약 수
+
+    public VideoPlayer videoPlayer; // 비디오 플레이어
+    public RawImage videoImage; // 비디오가 표시될 Raw Image
+
+    void Start()
+    {
+        videoImage.gameObject.SetActive(false); // 초기에는 비디오 UI 비활성화
+    }
 
     void Update()
     {
@@ -74,32 +84,29 @@ public class PlayerFire : MonoBehaviour
         // PlayerPistol이 활성화 상태인지 확인하고, 탄약이 남아 있는지 확인
         if (PlayerPistol != null && PlayerPistol.activeInHierarchy && ammoCount > 0)
         {
-            // Fire1 버튼이 눌렸을 때
-            if (Input.GetButtonDown("Fire1"))
+            // 메인 카메라의 정면 방향으로 총알을 발사
+            Vector3 shootDirection = Camera.main.transform.forward;
+
+            // 총알 인스턴스를 생성하고 위치와 회전을 설정
+            GameObject bulletInstance = Instantiate(bulletPrefab, firePosition.transform.position, firePosition.transform.rotation);
+            BulletMove bulletMove = bulletInstance.GetComponent<BulletMove>();
+
+            if (bulletMove != null)
             {
-                // 메인 카메라의 정면 방향으로 총알을 발사
-                Vector3 shootDirection = Camera.main.transform.forward;
-
-                // 총알 인스턴스를 생성하고 위치와 회전을 설정
-                GameObject bulletInstance = Instantiate(bulletPrefab, firePosition.transform.position, firePosition.transform.rotation);
-                BulletMove bulletMove = bulletInstance.GetComponent<BulletMove>();
-
-                if (bulletMove != null)
-                {
-                    // 총알에 발사 방향 설정
-                    bulletMove.SetDirection(shootDirection);
-                    Debug.Log("Bullet Direction: " + shootDirection);
-                }
-
-                // 탄약 감소
-                ammoCount--;
-
-                Debug.Log("Bullet fired! Remaining ammo: " + ammoCount);
+                // 총알에 발사 방향 설정
+                bulletMove.SetDirection(shootDirection);
+                Debug.Log("Bullet Direction: " + shootDirection);
             }
+
+            // 탄약 감소
+            ammoCount--;
+
+            Debug.Log("Bullet fired! Remaining ammo: " + ammoCount);
         }
         else
         {
             Debug.Log("Cannot fire. Either no PlayerPistol or no ammo left.");
+            PlayOutOfAmmoVideo(); // 탄약이 없을 때 비디오 재생
         }
     }
 
@@ -126,4 +133,21 @@ public class PlayerFire : MonoBehaviour
         ammoCount = 5;
         Debug.Log("Ammo count reset to: " + ammoCount);
     }
+<<<<<<< Updated upstream
 }
+=======
+
+    void PlayOutOfAmmoVideo()
+    {
+        videoImage.gameObject.SetActive(true); // 비디오 UI 활성화
+        videoPlayer.Play(); // 비디오 플레이어 시작
+        videoPlayer.loopPointReached += EndReached; // 비디오가 끝날 때 호출되는 이벤트 등록
+    }
+
+    void EndReached(VideoPlayer vp)
+    {
+        videoImage.gameObject.SetActive(false); // 비디오 UI 비활성화
+    }
+}
+
+>>>>>>> Stashed changes
