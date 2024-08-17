@@ -55,7 +55,7 @@ public class PlayerFire : MonoBehaviour
         // 플레이어의 정면으로 레이캐스트를 쏘아 충돌 여부를 확인
         if (Physics.Raycast(transform.position, transform.forward, out hit, punchRange))
         {
-            Debug.Log("Raycast hit: " + hit.collider.gameObject.name); // 충돌한 객체의 이름을 로그로 출력
+            //Debug.Log("Raycast hit: " + hit.collider.gameObject.name); // 충돌한 객체의 이름을 로그로 출력
 
             // 충돌한 객체가 'Enemy' 태그를 가지고 있는 경우
             if (hit.collider.gameObject.CompareTag("Enemy"))
@@ -68,13 +68,13 @@ public class PlayerFire : MonoBehaviour
                     StartCoroutine(enemyAI.Stun());  // Enemy 스턴 적용
                     enemyAI.throwEnemyPistol();  // 적의 총을 던지는 함수 호출
                     enemyAI.TakePunchDamage(); // 적에게 펀치 데미지를 입힘
-                    Debug.Log("Enemy stunned and pistol thrown: " + hit.collider.gameObject.name); // 스턴 및 피스톨 던지기 적용 디버그 메시지
+                    //Debug.Log("Enemy stunned and pistol thrown: " + hit.collider.gameObject.name); // 스턴 및 피스톨 던지기 적용 디버그 메시지
                 }
             }
         }
         else
         {
-            Debug.Log("Raycast did not hit any enemy."); // 적을 맞추지 못한 경우 로그 출력
+            //Debug.Log("Raycast did not hit any enemy."); // 적을 맞추지 못한 경우 로그 출력
         }
     }
 
@@ -133,10 +133,6 @@ public class PlayerFire : MonoBehaviour
         ammoCount = 5;
         Debug.Log("Ammo count reset to: " + ammoCount);
     }
-<<<<<<< Updated upstream
-}
-=======
-
     void PlayOutOfAmmoVideo()
     {
         videoImage.gameObject.SetActive(true); // 비디오 UI 활성화
@@ -149,5 +145,3 @@ public class PlayerFire : MonoBehaviour
         videoImage.gameObject.SetActive(false); // 비디오 UI 비활성화
     }
 }
-
->>>>>>> Stashed changes

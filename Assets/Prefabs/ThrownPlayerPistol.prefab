@@ -758,8 +758,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1786759125029253417}
-  - component: {fileID: -393219977504140527}
   - component: {fileID: -936078184739816209}
+  - component: {fileID: -828848030984923422}
+  - component: {fileID: 1345890611139567617}
   m_Layer: 0
   m_Name: ThrownPlayerPistol
   m_TagString: Untagged
@@ -783,27 +784,6 @@ Transform:
   - {fileID: 8536490692948714285}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
---- !u!135 &-393219977504140527
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3763604498974455608}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &-936078184739816209
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -831,6 +811,39 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &-828848030984923422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3763604498974455608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60685ce45f656e549955f6b429c9833f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!65 &1345890611139567617
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3763604498974455608}
+  m_Material: {fileID: 13400000, guid: c5e508a3816b4f448ab2521b1e28a8c4, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.1, y: 0.1, z: 0.1}
+  m_Center: {x: 0, y: 0.1, z: 0}
 --- !u!1 &3899073714259699312
 GameObject:
   m_ObjectHideFlags: 0

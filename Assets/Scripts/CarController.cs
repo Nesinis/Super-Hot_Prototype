@@ -1,5 +1,7 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Video;
 
 public class CarController : MonoBehaviour
 {
@@ -7,29 +9,90 @@ public class CarController : MonoBehaviour
     public float driftAmount = 5f;
 
     private bool hasDrifted = false;
+    private bool collisionEnabled = true;
+
+    public GameObject crosshair1;
+    public GameObject crosshair2;
+    public GameObject restartInstructionImage;
+
+    public VideoPlayer videoPlayer;
+    public RawImage restartVideoDisplay;
+
+    private GameManager gameManager; // GameManager를 참조하기 위한 변수
+
+    void Start()
+    {
+        StartCoroutine(DisableCollisionAfterTime(1f));
+        gameManager = FindObjectOfType<GameManager>(); // GameManager 찾기
+    }
 
     void Update()
     {
         if (!hasDrifted)
         {
-            // 차가 앞으로 이동
             transform.Translate(Vector3.forward * speed * Time.deltaTime);
-
-            // 드리프트를 시작
             StartCoroutine(Drift());
         }
     }
 
     IEnumerator Drift()
     {
-        // 드리프트 실행
-        yield return new WaitForSeconds(1f); // 드리프트 시간
-        transform.Rotate(Vector3.up, driftAmount); // 단순한 회전으로 드리프트 구현
+        yield return new WaitForSeconds(1f);
+        transform.Rotate(Vector3.up, driftAmount);
 
-        // 드리프트가 완료되면 플래그 설정
         hasDrifted = true;
-
-        // 차를 멈춤
         speed = 0f;
+    }
+
+    IEnumerator DisableCollisionAfterTime(float time)
+    {
+        yield return new WaitForSeconds(time);
+        collisionEnabled = false;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("충돌 감지됨");
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            if (collisionEnabled)
+            {
+                Debug.Log("충돌이 활성화된 상태에서 플레이어와 충돌함");
+
+                Transform playerCamera = collision.transform.Find("Main Camera");
+
+                if (playerCamera != null)
+                {
+                    Vector3 cameraPosition = playerCamera.position;
+                    Quaternion cameraRotation = playerCamera.rotation;
+
+                    playerCamera.SetParent(null);
+                    cameraPosition.y = 1.080001f;
+                    playerCamera.position = cameraPosition;
+                    playerCamera.rotation = cameraRotation;
+
+                    playerCamera.gameObject.AddComponent<SmoothFollow>();
+                    playerCamera.gameObject.SetActive(true);
+                }
+
+                if (crosshair1 != null) crosshair1.gameObject.SetActive(false);
+                if (crosshair2 != null) crosshair2.gameObject.SetActive(false);
+                if (restartInstructionImage != null) restartInstructionImage.SetActive(true);
+
+                if (videoPlayer != null && restartVideoDisplay != null)
+                {
+                    restartVideoDisplay.gameObject.SetActive(true);
+                    videoPlayer.Play();
+                }
+
+                gameObject.SetActive(false);
+                collision.gameObject.SetActive(false);
+
+                if (gameManager != null)
+                {
+                    gameManager.OnPlayerHit(); // GameManager의 메소드 호출
+                }
+            }
+        }
     }
 }

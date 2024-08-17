@@ -251,4 +251,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f97bebd4fc4bd3b448f44d3f99eda05d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletSpeed: 10
+  bulletSpeed: 5
+  restartInstructionImage: {fileID: 0}
+  crosshair1: {fileID: 0}
+  crosshair2: {fileID: 0}
+  restartHoldTime: 2

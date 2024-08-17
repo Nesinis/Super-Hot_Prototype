@@ -91,14 +91,14 @@ public class EnemyAI : MonoBehaviour
                 }
             }
         }
-        if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
-        {
-            agent.isStopped = true;  // 이동 중지
-        }
-        else
-        {
-            Debug.LogWarning("NavMeshAgent is either not active or not placed on a NavMesh.");
-        }
+        //if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
+        //{
+        //    agent.isStopped = true;  // 이동 중지
+        //}
+        //else
+        //{
+        //    Debug.LogWarning("NavMeshAgent is either not active or not placed on a NavMesh.");
+        //}
     }
 
     void AttackWithMelee()
@@ -195,25 +195,25 @@ public class EnemyAI : MonoBehaviour
             if (explosionParticlePrefab != null)
             {
                 GameObject explosion = Instantiate(explosionParticlePrefab, transform.position, Quaternion.identity);
-                Debug.Log("Explosion particle instantiated."); // 디버그 메시지 추가
+                //Debug.Log("Explosion particle instantiated."); // 디버그 메시지 추가
 
                 ParticleSystem ps = explosion.GetComponent<ParticleSystem>();
                 if (ps != null)
                 {
                     ps.Play();
-                    Debug.Log("Explosion particle played."); // 디버그 메시지 추가
+                    //Debug.Log("Explosion particle played."); // 디버그 메시지 추가
 
                     // 파티클의 수명에 맞추어 파티클 오브젝트 제거
                     Destroy(explosion, ps.main.duration + ps.main.startLifetime.constantMax);
                 }
                 else
                 {
-                    Debug.LogWarning("ParticleSystem component not found on explosion particle prefab.");
+                    //Debug.LogWarning("ParticleSystem component not found on explosion particle prefab.");
                 }
             }
             else
             {
-                Debug.LogWarning("Explosion particle prefab is not assigned.");
+                //Debug.LogWarning("Explosion particle prefab is not assigned.");
             }
 
             // 즉시 적 객체를 제거
@@ -280,7 +280,7 @@ public class EnemyAI : MonoBehaviour
 
             if (rb != null)
             {
-                Vector3 throwDir = (throwRotaion.transform.forward + throwRotaion.transform.up * 0.3f).normalized;
+                Vector3 throwDir = (throwRotaion.transform.forward + throwRotaion.transform.up).normalized;
                 rb.AddForce(throwDir * throwPower, ForceMode.Impulse);
             }
 
