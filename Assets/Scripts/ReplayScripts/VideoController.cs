@@ -1,6 +1,6 @@
 using UnityEngine;
-using UnityEngine.Video;
 using UnityEngine.SceneManagement;
+using UnityEngine.Video;
 
 public class VideoController : MonoBehaviour
 {
@@ -9,6 +9,14 @@ public class VideoController : MonoBehaviour
     void Start()
     {
         videoPlayer = GetComponent<VideoPlayer>();
+
+        // VideoPlayer가 없으면 더 이상 실행하지 않도록 수정
+        if (videoPlayer == null)
+        {
+            Debug.LogWarning("VideoPlayer component is missing. Skipping video playback.");
+            return;
+        }
+
         videoPlayer.loopPointReached += OnVideoFinished;
         videoPlayer.Play();
     }

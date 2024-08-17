@@ -1,52 +1,62 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class EnemyAI : MonoBehaviour
 {
-    public Transform player; // 플레이어의 위치를 저장할 변수
-    private NavMeshAgent agent; // NavMeshAgent 컴포넌트를 참조할 변수
-    public float minAttackRange = 0.5f; // 근접 공격 거리
-    public float attackRange = 10.0f; // 원거리 공격 거리
-    public float attackCooldown = 2.0f; // 공격 쿨다운 시간
-    private float lastAttackTime; // 마지막 공격 시간을 저장할 변수
-    public GameObject pistol2; // 총 오브젝트 참조
+    public Transform player;
+    private NavMeshAgent agent;
+    public float minAttackRange = 0.5f;
+    public float attackRange = 10.0f;
+    public float attackCooldown = 2.0f;
+    private float lastAttackTime;
+    public GameObject pistol2;
 
-    public GameObject bulletPrefab; // 총알 프리팹
-    public Transform firePoint; // 총알 발사 위치
-    public float bulletSpeed = 10.0f; // 총알 속도
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+    public float bulletSpeed = 10.0f;
 
-    private Animator animator; // 애니메이터 컴포넌트를 참조할 변수
-    private bool isDead = false; // 적이 죽었는지 여부를 확인하는 변수
-    private bool playerIsDead = false; // 플레이어가 죽었는지 여부를 확인하는 변수
-    private bool isAttacking = false; // 적이 공격 중인지 여부를 확인하는 변수
+    private Animator animator;
+    private bool isDead = false;
+    private bool playerIsDead = false;
+    private bool isAttacking = false;
+    private bool isStunned = false;
 
-    public Material brightRedMaterial; // 밝은 빨간색 Material
-    public bool hasGun = false; // 적이 총을 들고 있는지 여부를 나타내는 변수
+    public Material brightRedMaterial;
+    public bool hasGun = false;
 
-    public float attackWaitTime = 1.0f; // 공격 후 추가 대기 시간
-    public float shootDelay = 0.1f; // 총알 발사 딜레이 (애니메이션이 시작된 후)
+    public float attackWaitTime = 1.0f;
+    public float shootDelay = 0.1f;
 
     public GameObject thrownEnemyPistol;
     public GameObject throwRotaion;
     public float throwPower = 3f;
 
-    public GameObject explosionParticlePrefab; // 폭죽 파티클 프리팹
+    public GameObject explosionParticlePrefab;
 
-    private AudioSource audioSource; // AudioSource 컴포넌트
-    public AudioClip deathSound; // 적 사망 사운드 클립
-    private bool isStunned = false; // 적이 경직 상태인지 여부를 확인하는 변수
+    private AudioSource audioSource;
+    public AudioClip deathSound;
 
-    public int punchHealth = 3; // 적의 펀치 공격에 대한 체력 변수
+    private EnemyManager enemyManager;
+
+    public int health = 3;
+
+    private List<Vector3> recordedPositions = new List<Vector3>();
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        animator = GetComponent<Animator>();
-        audioSource = GetComponent<AudioSource>(); // AudioSource 컴포넌트 가져오기
-        lastAttackTime = -attackCooldown; // 시작 시 바로 공격할 수 있도록 설정
+        if (agent == null)
+        {
+            Debug.LogError("NavMeshAgent component is missing from this game object.");
+        }
 
-        CheckGunPresence(); // 총의 존재 여부를 확인하여 애니메이터 초기 상태 설정
+        animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
+        lastAttackTime = -attackCooldown;
+
+        CheckGunPresence();
 
         if (player != null)
         {
@@ -56,26 +66,26 @@ public class EnemyAI : MonoBehaviour
                 playerHealth.OnPlayerDeath.AddListener(HandlePlayerDeath);
             }
         }
+
+        enemyManager = FindObjectOfType<EnemyManager>();
+        RecordPosition();
     }
 
     void Update()
     {
         if (isDead || playerIsDead || isStunned)
-            return; // 적이나 플레이어가 죽었거나, 스턴 상태이면 업데이트를 중지합니다.
+            return;
 
         if (isAttacking)
-            return; // 공격 중이면 이동을 멈춥니다.
+            return;
 
-        LookAtPlayer();
-
-        CheckGunPresence(); // 매 프레임마다 총의 존재 여부를 확인
+        CheckGunPresence();
         if (player != null)
         {
             agent.SetDestination(player.position);
 
-            // 애니메이션 업데이트
             float speed = agent.velocity.magnitude;
-            animator.SetFloat("Speed", speed); // 지속적으로 Speed 값을 업데이트
+            animator.SetFloat("Speed", speed);
 
             float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
@@ -91,20 +101,12 @@ public class EnemyAI : MonoBehaviour
                 }
             }
         }
-        if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
-        {
-            agent.isStopped = true;  // 이동 중지
-        }
-        else
-        {
-            Debug.LogWarning("NavMeshAgent is either not active or not placed on a NavMesh.");
-        }
     }
 
     void AttackWithMelee()
     {
         isAttacking = true;
-        agent.isStopped = true; // 이동을 멈춥니다.
+        agent.isStopped = true;
 
         StartCoroutine(ResumeMovementAfterAttack());
     }
@@ -112,7 +114,7 @@ public class EnemyAI : MonoBehaviour
     void AttackWithGun()
     {
         isAttacking = true;
-        agent.isStopped = true; // 이동을 멈춥니다.
+        agent.isStopped = true;
 
         StartCoroutine(ShootAfterDelay());
         StartCoroutine(ResumeMovementAfterAttack());
@@ -120,9 +122,14 @@ public class EnemyAI : MonoBehaviour
 
     public void Shoot()
     {
+        if (isDead)
+        {
+            return;
+        }
+
         if (bulletPrefab != null && firePoint != null && player != null)
         {
-            Vector3 targetPosition = player.position; // 플레이어의 중심을 목표로 설정
+            Vector3 targetPosition = player.position;
             Vector3 direction = (targetPosition - firePoint.position).normalized;
 
             GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.LookRotation(direction));
@@ -130,16 +137,16 @@ public class EnemyAI : MonoBehaviour
 
             if (rb != null)
             {
-                rb.useGravity = false; // 중력 사용 비활성화
-                rb.velocity = direction * bulletSpeed; // 총알의 초기 속도를 설정
+                rb.useGravity = false;
+                rb.velocity = direction * bulletSpeed;
 
                 TrailRenderer trail = bullet.GetComponent<TrailRenderer>();
                 if (trail != null)
                 {
-                    trail.material = brightRedMaterial;  // 밝은 빨간색 Material 적용
-                    trail.time = 0.3f; // 궤적의 지속 시간
-                    trail.startWidth = 0.05f; // 궤적의 시작 폭
-                    trail.endWidth = 0.01f;   // 궤적의 끝 폭
+                    trail.material = brightRedMaterial;
+                    trail.time = 0.3f;
+                    trail.startWidth = 0.05f;
+                    trail.endWidth = 0.01f;
                 }
                 else
                 {
@@ -157,7 +164,7 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    System.Collections.IEnumerator ShootAfterDelay()
+    IEnumerator ShootAfterDelay()
     {
         yield return new WaitForSeconds(shootDelay);
 
@@ -169,7 +176,7 @@ public class EnemyAI : MonoBehaviour
         Shoot();
     }
 
-    System.Collections.IEnumerator ResumeMovementAfterAttack()
+    IEnumerator ResumeMovementAfterAttack()
     {
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
         yield return new WaitForSeconds(attackWaitTime);
@@ -180,92 +187,51 @@ public class EnemyAI : MonoBehaviour
 
     public void Die()
     {
-        if (!isDead)  // 사망 상태가 아닌 경우에만 처리
+        if (!isDead)
         {
             isDead = true;
-            agent.enabled = false; // NavMeshAgent를 비활성화합니다.
+            agent.enabled = false;
 
-            // 사망 사운드 재생
+            if (enemyManager != null)
+            {
+                enemyManager.OnEnemyDeath(this); // 수정된 부분
+            }
+
             if (audioSource != null && deathSound != null)
             {
                 audioSource.PlayOneShot(deathSound);
             }
 
-            // 폭죽 파티클 효과 생성
-            if (explosionParticlePrefab != null)
-            {
-                GameObject explosion = Instantiate(explosionParticlePrefab, transform.position, Quaternion.identity);
-                Debug.Log("Explosion particle instantiated."); // 디버그 메시지 추가
-
-                ParticleSystem ps = explosion.GetComponent<ParticleSystem>();
-                if (ps != null)
-                {
-                    ps.Play();
-                    Debug.Log("Explosion particle played."); // 디버그 메시지 추가
-
-                    // 파티클의 수명에 맞추어 파티클 오브젝트 제거
-                    Destroy(explosion, ps.main.duration + ps.main.startLifetime.constantMax);
-                }
-                else
-                {
-                    Debug.LogWarning("ParticleSystem component not found on explosion particle prefab.");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("Explosion particle prefab is not assigned.");
-            }
-
-            // 즉시 적 객체를 제거
-            Destroy(gameObject); // 적 객체를 즉시 제거
+            gameObject.SetActive(false);
         }
     }
 
     void HandlePlayerDeath()
     {
         playerIsDead = true;
-        agent.isStopped = true; // 적의 움직임을 멈춥니다.
-        animator.SetFloat("Speed", 0); // 이동 애니메이션을 멈춥니다.
+        agent.isStopped = true;
+        animator.SetFloat("Speed", 0);
     }
 
-    public void CheckGunPresence()
+    void CheckGunPresence()
     {
         if (pistol2 != null)
         {
-            hasGun = pistol2.activeInHierarchy; // 총의 존재 여부를 확인
-            animator.SetBool("HasGun", hasGun); // 애니메이터 상태 업데이트
-            //Debug.Log("HasGun 상태: " + hasGun);
+            hasGun = pistol2.activeInHierarchy;
+            animator.SetBool("HasGun", hasGun);
         }
         else
         {
-            hasGun = false; // pistol2가 null이면 총이 없는 상태로 설정
-            animator.SetBool("HasGun", hasGun); // 애니메이터 상태 업데이트
-            //Debug.Log("HasGun 상태: " + hasGun);
-        }
-    }
-
-    void LookAtPlayer()
-    {
-        if (player != null)
-        {
-            Vector3 direction = player.position - transform.position;
-            direction.y = 0;
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10.0f);
+            hasGun = false;
+            animator.SetBool("HasGun", hasGun);
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("ThrownPlayerPistol") || other.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            // 피스톨 던지기 또는 근접 공격에 맞았을 때 스턴
-            StartCoroutine(Stun());
-        }
-
-        if (other.gameObject.name.Contains("ThrownPlayerPistol"))
-        {
-            throwEnemyPistol();
+            Die();
         }
     }
 
@@ -274,7 +240,7 @@ public class EnemyAI : MonoBehaviour
         if (pistol2 != null)
         {
             Destroy(pistol2);
-            pistol2 = null; // 참조 초기화
+            pistol2 = null;
             GameObject goThrownEnemyPistol = Instantiate(thrownEnemyPistol, throwRotaion.transform.position, throwRotaion.transform.rotation);
             Rigidbody rb = goThrownEnemyPistol.GetComponent<Rigidbody>();
 
@@ -284,76 +250,88 @@ public class EnemyAI : MonoBehaviour
                 rb.AddForce(throwDir * throwPower, ForceMode.Impulse);
             }
 
-            // PlayerMovement에 있는 ThrownEnemyPistol 변수를 업데이트합니다.
             PlayerMovement playerMovement = FindObjectOfType<PlayerMovement>();
             if (playerMovement != null)
             {
                 playerMovement.UpdateThrownEnemyPistol(goThrownEnemyPistol);
             }
 
-            // 피스톨을 던진 후 총의 존재 여부를 확인하여 상태 업데이트
             CheckGunPresence();
         }
     }
 
     public IEnumerator Stun()
     {
-        Debug.Log(gameObject.name + " is now stunned.");  // 스턴 시작 디버그 메시지
-
-        // 현재 객체가 파괴되었는지 확인
-        if (this == null)
+        if (isStunned || isDead)
         {
-            Debug.LogWarning("EnemyAI object has been destroyed. Exiting Stun coroutine.");
-            yield break;  // 코루틴 종료
+            yield break;
         }
 
-        // NavMeshAgent가 유효하고 활성화된 경우에만 이동 중지를 설정합니다.
-        if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
+        isStunned = true;
+
+        if (agent != null)
         {
-            agent.isStopped = true;  // NavMeshAgent 이동 중지
-        }
-        else
-        {
-            Debug.LogWarning("NavMeshAgent is not active or not placed on a NavMesh. Cannot stop agent.");
+            agent.isStopped = true;
         }
 
-        animator.SetTrigger("Stun"); // 경직 애니메이션 트리거
+        if (animator != null)
+        {
+            animator.SetTrigger("Stun");
+        }
 
-        // 피스톨 떨어뜨리기
         throwEnemyPistol();
 
-        yield return new WaitForSeconds(1.0f);  // 1초간 대기
+        yield return new WaitForSeconds(1.0f);
 
-        // 현재 객체가 파괴되었는지 확인
-        if (this == null)
+        if (this != null && !isDead)
         {
-            Debug.LogWarning("EnemyAI object has been destroyed during stun. Exiting coroutine.");
-            yield break;  // 코루틴 종료
+            agent.isStopped = false;
+            isStunned = false;
         }
-
-        // NavMeshAgent가 유효하고 활성화된 경우에만 이동 재개를 설정합니다.
-        if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
-        {
-            agent.isStopped = false;  // 이동 재개
-        }
-        else
-        {
-            Debug.LogWarning("NavMeshAgent is not active or not placed on a NavMesh. Cannot resume agent.");
-        }
-
-        Debug.Log(gameObject.name + " has recovered from stun.");  // 스턴 해제 디버그 메시지
     }
-
-
 
     public void TakePunchDamage()
     {
-        punchHealth--; // 펀치 공격에 맞으면 체력을 감소시킵니다.
-        Debug.Log(gameObject.name + " takes punch damage. Remaining punch health: " + punchHealth);
+        health--;
 
-        if (punchHealth <= 0)
+        if (health > 0)
         {
-            Die(); // 체력이 0 이하가 되면 사망 처리
+            StartCoroutine(Stun());
         }
+        else
+        {
+            Die();
+        }
+    }
+
+    public void TakeDamage()
+    {
+        Die();
+    }
+
+    public void TriggerDeath()
+    {
+        if (!isDead)
+        {
+            isDead = true;
+            enemyManager.OnEnemyDeath(this); // `this`를 전달
+            gameObject.SetActive(false);
+        }
+    }
+
+    public interface IDamageable
+    {
+        void TakeDamage();
+        void Die();
+    }
+
+    void RecordPosition()
+    {
+        recordedPositions.Add(transform.position);
+    }
+
+    public List<Vector3> GetRecordedPositions()
+    {
+        return recordedPositions;
     }
 }

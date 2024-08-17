@@ -35,6 +35,7 @@ public class PlayerMovement : MonoBehaviour
 
     public Transform punchOrigin; // 주먹 공격의 시작 지점
     public float punchRange = 1.0f; // 주먹 공격의 범위
+    private ReplaySystemManager replaySystemManager;
 
     void Start()
     {
@@ -47,6 +48,9 @@ public class PlayerMovement : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         // 초기 Y 위치를 저장
         lastYPosition = transform.position.y;
+
+        replaySystemManager = FindObjectOfType<ReplaySystemManager>();
+
     }
 
     void Update()
@@ -62,6 +66,7 @@ public class PlayerMovement : MonoBehaviour
 
         getPistol(); // 플레이어가 총을 잡는다.
         HandleAttack(); // 플레이어 공격 처리
+
     }
 
     void HandleRotation()
