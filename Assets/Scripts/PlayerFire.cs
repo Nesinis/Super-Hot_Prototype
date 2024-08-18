@@ -18,9 +18,13 @@ public class PlayerFire : MonoBehaviour
     public VideoPlayer videoPlayer; // 비디오 플레이어
     public RawImage videoImage; // 비디오가 표시될 Raw Image
 
+    public AudioClip gunshotSound; // 총알 발사 소리
+    private AudioSource audioSource; // AudioSource 컴포넌트
+
     void Start()
     {
         videoImage.gameObject.SetActive(false); // 초기에는 비디오 UI 비활성화
+        audioSource = GetComponent<AudioSource>(); // AudioSource 컴포넌트 가져오기
     }
 
     void Update()
@@ -84,6 +88,8 @@ public class PlayerFire : MonoBehaviour
         // PlayerPistol이 활성화 상태인지 확인하고, 탄약이 남아 있는지 확인
         if (PlayerPistol != null && PlayerPistol.activeInHierarchy && ammoCount > 0)
         {
+            audioSource.PlayOneShot(gunshotSound);
+
             // 메인 카메라의 정면 방향으로 총알을 발사
             Vector3 shootDirection = Camera.main.transform.forward;
 

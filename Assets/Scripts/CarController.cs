@@ -20,10 +20,22 @@ public class CarController : MonoBehaviour
 
     private GameManager gameManager; // GameManager를 참조하기 위한 변수
 
+    public AudioClip deathSound; // 플레이어 사망 사운드
+    private AudioSource audioSource; // AudioSource 컴포넌트
+
     void Start()
     {
         StartCoroutine(DisableCollisionAfterTime(1f));
         gameManager = FindObjectOfType<GameManager>(); // GameManager 찾기
+
+        // AudioSource 컴포넌트를 가져옵니다.
+        audioSource = GetComponent<AudioSource>();
+
+        // audioSource가 할당되지 않은 경우에 대한 처리
+        if (audioSource == null)
+        {
+            Debug.LogError("AudioSource component missing from this game object. Please add an AudioSource component.");
+        }
     }
 
     void Update()
@@ -59,6 +71,16 @@ public class CarController : MonoBehaviour
             {
                 Debug.Log("충돌이 활성화된 상태에서 플레이어와 충돌함");
 
+                // 사망 사운드 재생
+                if (audioSource != null && deathSound != null)
+                {
+                    audioSource.PlayOneShot(deathSound);
+                }
+                else
+                {
+                    Debug.LogWarning("Death sound or audio source is not assigned.");
+                }
+
                 Transform playerCamera = collision.transform.Find("Main Camera");
 
                 if (playerCamera != null)
@@ -77,7 +99,7 @@ public class CarController : MonoBehaviour
 
                 if (crosshair1 != null) crosshair1.gameObject.SetActive(false);
                 if (crosshair2 != null) crosshair2.gameObject.SetActive(false);
-                if (restartInstructionImage != null) restartInstructionImage.SetActive(true);
+                if (restartInstructionImage != null) restartInstructionImage.gameObject.SetActive(true);
 
                 if (videoPlayer != null && restartVideoDisplay != null)
                 {

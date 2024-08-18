@@ -34,10 +34,12 @@ public class EnemyAI : MonoBehaviour
     public GameObject explosionParticlePrefab; // 폭죽 파티클 프리팹
 
     private AudioSource audioSource; // AudioSource 컴포넌트
-    public AudioClip deathSound; // 적 사망 사운드 클립
+    public AudioClip deathSound; // 적 사망 사운드
     private bool isStunned = false; // 적이 경직 상태인지 여부를 확인하는 변수
 
     public int punchHealth = 3; // 적의 펀치 공격에 대한 체력 변수
+
+    public AudioClip gunshotSound; // 총알 발사 소리
 
     void Start()
     {
@@ -83,46 +85,61 @@ public class EnemyAI : MonoBehaviour
             {
                 if (hasGun && distanceToPlayer <= attackRange)
                 {
-                    AttackWithGun();
+                    StartCoroutine(AttackWithGun());
                 }
                 else if (!hasGun && distanceToPlayer <= minAttackRange)
                 {
-                    AttackWithMelee();
+                    StartCoroutine(AttackWithMelee());
                 }
             }
         }
-        //if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
-        //{
-        //    agent.isStopped = true;  // 이동 중지
-        //}
-        //else
-        //{
-        //    Debug.LogWarning("NavMeshAgent is either not active or not placed on a NavMesh.");
-        //}
     }
 
-    void AttackWithMelee()
+    IEnumerator AttackWithMelee()
     {
         isAttacking = true;
         agent.isStopped = true; // 이동을 멈춥니다.
 
-        StartCoroutine(ResumeMovementAfterAttack());
+        // 근접 공격 로직이 들어갈 수 있습니다.
+        animator.SetTrigger("MeleeAttack"); // 근접 공격 애니메이션 트리거
+
+        yield return new WaitForSeconds(attackWaitTime);
+
+        isAttacking = false;
+        agent.isStopped = false; // 공격 후 다시 이동 시작
     }
 
-    void AttackWithGun()
+    IEnumerator AttackWithGun()
     {
         isAttacking = true;
         agent.isStopped = true; // 이동을 멈춥니다.
 
-        StartCoroutine(ShootAfterDelay());
-        StartCoroutine(ResumeMovementAfterAttack());
+        animator.SetTrigger("Shoot"); // 총격 애니메이션 트리거
+
+        yield return StartCoroutine(ShootAfterDelay());
+
+        yield return new WaitForSeconds(attackWaitTime);
+
+        isAttacking = false;
+        agent.isStopped = false; // 공격 후 다시 이동 시작
     }
 
-    public void Shoot()
+    void Shoot()
     {
         if (bulletPrefab != null && firePoint != null && player != null)
         {
-            Vector3 targetPosition = player.position; // 플레이어의 중심을 목표로 설정
+            // gunshotSound가 할당되었는지 확인합니다.
+            if (gunshotSound != null)
+            {
+                // 발사 소리 재생
+                audioSource.PlayOneShot(gunshotSound);
+            }
+            else
+            {
+                Debug.LogWarning("gunshotSound is not assigned in " + gameObject.name);
+            }
+
+            Vector3 targetPosition = player.position;
             Vector3 direction = (targetPosition - firePoint.position).normalized;
 
             GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.LookRotation(direction));
@@ -130,16 +147,16 @@ public class EnemyAI : MonoBehaviour
 
             if (rb != null)
             {
-                rb.useGravity = false; // 중력 사용 비활성화
-                rb.velocity = direction * bulletSpeed; // 총알의 초기 속도를 설정
+                rb.useGravity = false;
+                rb.velocity = direction * bulletSpeed;
 
                 TrailRenderer trail = bullet.GetComponent<TrailRenderer>();
                 if (trail != null)
                 {
-                    trail.material = brightRedMaterial;  // 밝은 빨간색 Material 적용
-                    trail.time = 0.3f; // 궤적의 지속 시간
-                    trail.startWidth = 0.05f; // 궤적의 시작 폭
-                    trail.endWidth = 0.01f;   // 궤적의 끝 폭
+                    trail.material = brightRedMaterial;
+                    trail.time = 0.3f;
+                    trail.startWidth = 0.05f;
+                    trail.endWidth = 0.01f;
                 }
                 else
                 {
@@ -157,7 +174,7 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    System.Collections.IEnumerator ShootAfterDelay()
+    IEnumerator ShootAfterDelay()
     {
         yield return new WaitForSeconds(shootDelay);
 
@@ -167,15 +184,6 @@ public class EnemyAI : MonoBehaviour
         }
 
         Shoot();
-    }
-
-    System.Collections.IEnumerator ResumeMovementAfterAttack()
-    {
-        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
-        yield return new WaitForSeconds(attackWaitTime);
-
-        isAttacking = false;
-        agent.isStopped = false;
     }
 
     public void Die()
@@ -195,25 +203,15 @@ public class EnemyAI : MonoBehaviour
             if (explosionParticlePrefab != null)
             {
                 GameObject explosion = Instantiate(explosionParticlePrefab, transform.position, Quaternion.identity);
-                //Debug.Log("Explosion particle instantiated."); // 디버그 메시지 추가
 
                 ParticleSystem ps = explosion.GetComponent<ParticleSystem>();
                 if (ps != null)
                 {
                     ps.Play();
-                    //Debug.Log("Explosion particle played."); // 디버그 메시지 추가
 
                     // 파티클의 수명에 맞추어 파티클 오브젝트 제거
                     Destroy(explosion, ps.main.duration + ps.main.startLifetime.constantMax);
                 }
-                else
-                {
-                    //Debug.LogWarning("ParticleSystem component not found on explosion particle prefab.");
-                }
-            }
-            else
-            {
-                //Debug.LogWarning("Explosion particle prefab is not assigned.");
             }
 
             // 즉시 적 객체를 제거
@@ -234,13 +232,11 @@ public class EnemyAI : MonoBehaviour
         {
             hasGun = pistol2.activeInHierarchy; // 총의 존재 여부를 확인
             animator.SetBool("HasGun", hasGun); // 애니메이터 상태 업데이트
-            //Debug.Log("HasGun 상태: " + hasGun);
         }
         else
         {
             hasGun = false; // pistol2가 null이면 총이 없는 상태로 설정
             animator.SetBool("HasGun", hasGun); // 애니메이터 상태 업데이트
-            //Debug.Log("HasGun 상태: " + hasGun);
         }
     }
 
@@ -249,7 +245,8 @@ public class EnemyAI : MonoBehaviour
         if (player != null)
         {
             Vector3 direction = player.position - transform.position;
-            direction.y = 0;
+            direction.y = 0; // Y 축 회전을 방지
+
             Quaternion lookRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10.0f);
         }
@@ -336,15 +333,9 @@ public class EnemyAI : MonoBehaviour
         {
             agent.isStopped = false;  // 이동 재개
         }
-        else
-        {
-            Debug.LogWarning("NavMeshAgent is not active or not placed on a NavMesh. Cannot resume agent.");
-        }
 
         Debug.Log(gameObject.name + " has recovered from stun.");  // 스턴 해제 디버그 메시지
     }
-
-
 
     public void TakePunchDamage()
     {
