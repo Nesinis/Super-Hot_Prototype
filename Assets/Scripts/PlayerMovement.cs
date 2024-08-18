@@ -47,13 +47,12 @@ public class PlayerMovement : MonoBehaviour
         getPistol();
         HandleAttack();
 
-        // 마우스 오른쪽 버튼을 눌렀을 때
-        if (Input.GetMouseButtonDown(1))
+        // R 키를 눌렀을 때
+        if (Input.GetKeyDown(KeyCode.R))
         {
-            Debug.Log("Right mouse button pressed - Restarting scene");
+            Debug.Log("R key pressed - Restarting scene");
             SceneManager.LoadScene("JumpScene"); // "JumpScene"은 재시작할 씬의 이름입니다.
         }
-
     }
 
     void HandleRotation()

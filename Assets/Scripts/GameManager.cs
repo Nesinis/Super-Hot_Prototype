@@ -15,6 +15,20 @@ public class GameManager : MonoBehaviour
         {
             restartVideoDisplay.gameObject.SetActive(false);
         }
+        else
+        {
+            Debug.LogError("RestartVideoDisplay is not assigned!");
+        }
+
+        if (videoPlayer == null)
+        {
+            Debug.LogError("VideoPlayer is not assigned!");
+        }
+
+        if (smoothFollow == null)
+        {
+            Debug.LogError("SmoothFollow is not assigned!");
+        }
     }
 
     // 플레이어가 차에 부딪히거나 총에 맞았는지 확인하는 메소드

@@ -10,16 +10,15 @@ public class Bullet : MonoBehaviour
     private GameObject crosshair1; // Crosshair UI
     private GameObject crosshair2; // Crosshair UI
 
-    // TimeControl 스크립트를 참조하기 위한 변수
-    private TimeControl timeControl;
+    public float restartHoldTime = 2.0f; // R 키를 길게 눌러야 하는 시간 (초)
+
+    private float holdTime = 0f; // R 키가 눌린 시간을 추적
+
+    private TimeControl timeControl; // TimeControl 스크립트를 참조하기 위한 변수
 
     private bool isMoving = false;
 
     private GameManager gameManager; // GameManager를 참조하기 위한 변수
-
-    public AudioClip playerDeathSound; // 플레이어 사망 사운드
-    public AudioClip enemyDeathSound; // 적 사망 사운드
-    private AudioSource audioSource; // AudioSource 컴포넌트
 
     void Start()
     {
@@ -38,13 +37,11 @@ public class Bullet : MonoBehaviour
             Debug.LogWarning("Bullet 프리팹에 Rigidbody 컴포넌트가 없습니다.");
         }
 
-        // AudioSource 컴포넌트를 가져옵니다.
-        audioSource = GetComponent<AudioSource>();
-
-        // audioSource가 할당되지 않은 경우에 대한 처리
-        if (audioSource == null)
+        // GameManager를 찾아서 참조합니다.
+        gameManager = FindObjectOfType<GameManager>();
+        if (gameManager == null)
         {
-            Debug.LogError("AudioSource component missing from this game object. Please add an AudioSource component.");
+            Debug.LogError("GameManager를 찾을 수 없습니다.");
         }
     }
 
@@ -52,16 +49,6 @@ public class Bullet : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            // 플레이어가 죽을 때 사망 사운드 재생
-            if (audioSource != null && playerDeathSound != null)
-            {
-                audioSource.PlayOneShot(playerDeathSound);
-            }
-            else
-            {
-                Debug.LogWarning("Player death sound or audio source is not assigned.");
-            }
-
             Transform playerCamera = other.transform.Find("Main Camera");
 
             if (playerCamera != null)
@@ -100,16 +87,6 @@ public class Bullet : MonoBehaviour
         }
         else if (other.CompareTag("Enemy"))
         {
-            // 적이 죽을 때 사망 사운드 재생
-            if (audioSource != null && enemyDeathSound != null)
-            {
-                audioSource.PlayOneShot(enemyDeathSound);
-            }
-            else
-            {
-                Debug.LogWarning("Enemy death sound or audio source is not assigned.");
-            }
-
             EnemyAI enemyAI = other.GetComponent<EnemyAI>();
             if (enemyAI != null)
             {

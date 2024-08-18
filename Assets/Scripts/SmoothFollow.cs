@@ -32,7 +32,7 @@ public class SmoothFollow : MonoBehaviour
         targetRotation = initialRotation * Quaternion.Euler(0, angle, 0); // 목표 회전값 업데이트
 
         // 마우스 오른쪽 버튼을 눌렀을 때
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetKeyDown(KeyCode.R))
         {
             Debug.Log("Right mouse button pressed - Restarting scene");
             SceneManager.LoadScene("JumpScene"); // "JumpScene"은 재시작할 씬의 이름입니다.

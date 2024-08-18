@@ -33,8 +33,9 @@ public class EnemyAI : MonoBehaviour
 
     public GameObject explosionParticlePrefab; // 폭죽 파티클 프리팹
 
-    private AudioSource audioSource; // AudioSource 컴포넌트
-    public AudioClip deathSound; // 적 사망 사운드
+    private EnemyManager enemyManager; // EnemyManager를 참조하는 변수
+    private AudioSource audioSource; // AudioSource 컴포넌트를 참조하는 변수
+
     private bool isStunned = false; // 적이 경직 상태인지 여부를 확인하는 변수
 
     public int punchHealth = 3; // 적의 펀치 공격에 대한 체력 변수
@@ -47,6 +48,7 @@ public class EnemyAI : MonoBehaviour
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>(); // AudioSource 컴포넌트 가져오기
         lastAttackTime = -attackCooldown; // 시작 시 바로 공격할 수 있도록 설정
+        enemyManager = FindObjectOfType<EnemyManager>(); // EnemyManager 오브젝트를 찾습니다.
 
         CheckGunPresence(); // 총의 존재 여부를 확인하여 애니메이터 초기 상태 설정
 
@@ -91,6 +93,7 @@ public class EnemyAI : MonoBehaviour
                 {
                     StartCoroutine(AttackWithMelee());
                 }
+                lastAttackTime = Time.time; // 마지막 공격 시간을 현재 시간으로 업데이트
             }
         }
     }
@@ -193,10 +196,10 @@ public class EnemyAI : MonoBehaviour
             isDead = true;
             agent.enabled = false; // NavMeshAgent를 비활성화합니다.
 
-            // 사망 사운드 재생
-            if (audioSource != null && deathSound != null)
+            // 사망 사운드를 EnemyManager를 통해 재생
+            if (enemyManager != null)
             {
-                audioSource.PlayOneShot(deathSound);
+                enemyManager.PlayDeathSound();
             }
 
             // 폭죽 파티클 효과 생성
@@ -215,7 +218,7 @@ public class EnemyAI : MonoBehaviour
             }
 
             // 즉시 적 객체를 제거
-            Destroy(gameObject); // 적 객체를 즉시 제거
+            gameObject.SetActive(false); // 적 객체를 비활성화
         }
     }
 
