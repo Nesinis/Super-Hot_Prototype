@@ -17,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
 
     private float verticalRotation = 0f;
     private bool isJumping = false;
+    private bool isMoving = false; // 추가된 변수
 
     public GameObject PlayerPistol;
     private GameObject ThrownEnemyPistol;
@@ -77,6 +78,11 @@ public class PlayerMovement : MonoBehaviour
         if (moveDirection.magnitude > 0)
         {
             rb.MovePosition(rb.position + moveDirection * moveSpeed * Time.deltaTime);
+            isMoving = true; // 움직일 때 isMoving을 true로 설정
+        }
+        else
+        {
+            isMoving = false; // 움직이지 않을 때는 isMoving을 false로 설정
         }
     }
 
@@ -87,6 +93,7 @@ public class PlayerMovement : MonoBehaviour
             velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
             rb.velocity = new Vector3(rb.velocity.x, velocity.y, rb.velocity.z);
             isJumping = true;
+            isMoving = true; // 점프할 때도 isMoving을 true로 설정
         }
 
         if (isJumping)
@@ -101,16 +108,18 @@ public class PlayerMovement : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isJumping = false;
+            if (moveDirection.magnitude == 0)
+            {
+                isMoving = false; // 땅에 닿고 움직이지 않을 때 isMoving을 false로 설정
+            }
         }
     }
-
 
     void UpdateTimeControl()
     {
         if (timeControl != null)
         {
-            bool currentMovingState = rb.velocity.magnitude > 0;
-            timeControl.UpdateTimeScale(currentMovingState);
+            timeControl.UpdateTimeScale(isMoving); // isMoving 상태에 따라 시간 제어
         }
     }
 
