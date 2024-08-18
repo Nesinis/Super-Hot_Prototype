@@ -10,10 +10,6 @@ public class Bullet : MonoBehaviour
     private GameObject crosshair1; // Crosshair UI
     private GameObject crosshair2; // Crosshair UI
 
-    public float restartHoldTime = 2.0f; // R 키를 길게 눌러야 하는 시간 (초)
-
-    private float holdTime = 0f; // R 키가 눌린 시간을 추적
-
     // TimeControl 스크립트를 참조하기 위한 변수
     private TimeControl timeControl;
 
